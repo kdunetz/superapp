@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--*******************************************************************************
+* Copyright (c) 2014 IBM Corp.
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* and Eclipse Distribution License v1.0 which accompany this distribution.
+*
+* The Eclipse Public License is available at
+*   http://www.eclipse.org/legal/epl-v10.html
+* and the Eclipse Distribution License is available at
+*   http://www.eclipse.org/org/documents/edl-v10.php.
+*
+* Contributors: Mike Robertson
+*
+*******************************************************************************-->
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/action_profiles"
+          android:title="@string/profiles_label"
+          android:orderInCategory="0"
+          android:showAsAction="never"/>
+    <item android:id="@+id/action_accel"
+          android:title="@string/accel_label"
+          android:orderInCategory="1"
+          android:showAsAction="never"/>
+    <item android:id="@+id/clear"
+          android:title="Clear Log"
+          android:orderInCategory="2"
+          android:showAsAction="never"/>
+    <item android:id="@+id/action_clear_profiles"
+          android:title="@string/clear_profiles_label"
+          android:orderInCategory="3"
+          android:showAsAction="never"/>
+    <item android:id="@+id/play_deals"
+        android:title="@string/play_deals_label"
+        android:orderInCategory="4"
+        android:showAsAction="never"/>
+    <item android:id="@+id/edit_search_criteria"
+        android:title="@string/edit_search_criteria"
+        android:orderInCategory="5"
+        android:showAsAction="never"/>
+    <item android:id="@+id/qrcode_reader"
+        android:title="@string/qrcode_reader"
+        android:orderInCategory="6"
+        android:showAsAction="never"/>
+    <item android:id="@+id/ocr_reader"
+        android:title="@string/ocr"
+        android:orderInCategory="7"
+        android:showAsAction="never"/>
+    <item android:id="@+id/find_neighbors"
+        android:title="@string/find_neighbors"
+        android:orderInCategory="8"
+        android:showAsAction="never"/>
+    <item android:id="@+id/dynamic_form"
+        android:title="@string/dynamic_form"
+        android:orderInCategory="8"
+        android:showAsAction="never"/>
+    <item android:id="@+id/dynamic_table"
+        android:title="@string/dynamic_table"
+        android:orderInCategory="9"
+        android:showAsAction="never"/>
+    <item android:id="@+id/select_image"
+        android:title="@string/select_image"
+        android:orderInCategory="10"
+        android:showAsAction="never"/>
+    <item android:id="@+id/scan_receipt"
+        android:title="@string/scan_receipt"
+        android:orderInCategory="11"
+        android:showAsAction="never"/>
+    <item android:id="@+id/settings"
+        android:title="@string/settings"
+        android:orderInCategory="12"
+        android:showAsAction="never"/>
+</menu>
+

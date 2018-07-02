@@ -1,0 +1,29 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/linearlayout"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    <Button style="@style/TopHeader"
+        android:layout_gravity="center"
+        android:text="Objects"
+        android:id="@+id/dynamicTableButton"/>
+    <Button style="@style/BottomButton"
+        android:layout_gravity="center"
+        android:text="Create"
+        android:id="@+id/create_button"/>
+
+
+    <ScrollView android:id="@+id/ScrollViewID"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent">
+
+    <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/table_layout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+        android:stretchColumns="1">
+
+    </TableLayout>
+    </ScrollView>
+
+</LinearLayout>

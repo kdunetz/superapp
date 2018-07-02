@@ -1,0 +1,1016 @@
+/*******************************************************************************
+ * Copyright (c) 2014 IBM Corp.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *   http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *
+ * Contributors:
+ *    Mike Robertson - initial contribution
+ *******************************************************************************/
+package com.ibm.iot.android.iotstarter;
+
+import android.*;
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.Application;
+import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
+import android.content.Context;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.hardware.Camera;
+import android.hardware.camera2.*;
+import android.location.Location;
+import android.location.LocationManager;
+import android.media.AudioManager;
+import android.os.Build;
+import android.provider.Telephony;
+import android.speech.tts.TextToSpeech;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.util.Log;
+import android.os.AsyncTask;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.RequestFuture;
+import com.android.volley.toolbox.Volley;
+import com.cloudant.client.api.ClientBuilder;
+import com.cloudant.client.api.CloudantClient;
+import com.cloudant.client.api.Database;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.Marker;
+import com.ibm.iot.android.iotstarter.utils.Constants;
+import com.ibm.iot.android.iotstarter.utils.DeviceSensor;
+import com.ibm.iot.android.iotstarter.utils.IoTProfile;
+import com.ibm.iot.android.iotstarter.utils.Deal;
+import com.ibm.iot.android.iotstarter.utils.RequestQueueSingleton;
+import com.ibm.iot.android.iotstarter.utils.User;
+//import com.ibm.mobilefirstplatform.clientsdk.android.push.api.MFPPush;
+//import com.ibm.mobilefirstplatform.clientsdk.android.push.api.MFPPushException;
+//import com.ibm.mobilefirstplatform.clientsdk.android.push.api.MFPPushNotificationListener;
+//import com.ibm.mobilefirstplatform.clientsdk.android.push.api.MFPPushResponseListener;
+//import com.ibm.mobilefirstplatform.clientsdk.android.push.api.MFPPushResponseListener;
+import com.ibm.iot.android.iotstarter.utils.Utility;
+import com.ibm.mqa.MQA;
+
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+/**
+ * Main class for the IoT Starter application. Stores values for
+ * important device and application information.
+ */
+public class IoTStarterApplication extends Application {
+    private final static String TAG = IoTStarterApplication.class.getName();
+    // private MFPPushNotificationListener notificationListener = null;
+
+    private Activity mActivity; // KAD added for Push
+    //public static MFPPush push = null; // KAD added for Push
+
+
+    // Current activity of the application, updated whenever activity is changed
+    private String currentRunningActivity;
+
+    // Values needed for connecting to IoT
+    private String organization;
+    private String deviceId;
+    private String authToken;
+    private Constants.ConnectionType connectionType;
+
+    private SharedPreferences settings;
+
+    // Application state variables
+    private boolean connected = false;
+    private int publishCount = 0;
+    private int receiveCount = 0;
+    private int unreadCount = 0;
+
+    private int color = Color.WHITE;
+    private boolean isCameraOn = false;
+    private float[] accelData;
+    private boolean accelEnabled = true;
+
+    private DeviceSensor deviceSensor;
+    private Location currentLocation;
+    private Camera camera;
+    private GoogleMap googleMap;
+    private Marker marker;
+
+    private HashMap<String, Marker> markers = new HashMap<String, Marker>();
+    private HashMap<String, Bitmap> bitmaps = new HashMap<String, Bitmap>();
+
+    // Message log for log activity
+    private ArrayList<String> messageLog = new ArrayList<String>();
+
+    private IoTProfile profile;
+    private List<IoTProfile> profiles = new ArrayList<IoTProfile>();
+    private ArrayList<String> profileNames = new ArrayList<String>();
+
+    public static final String APP_KEY = "1g2d05c95f55e7da8137f300f9ca1412d1fb1a9d51g0g2g35450d16";
+    private String currentUser = "";
+    public Vector dealLocations = new Vector();
+    public JSONArray localBusinesses = new JSONArray();
+    public Database db2 = null;
+    public Database userDB = null;
+    public JSONObject appUser = null;
+    public String httpResponse = null;
+    public TextToSpeech engine = null;
+    Vector couponCompanies = new Vector();
+
+    // Variables to be downloaded from central site or configured locally
+    public int sensorTiming = 5000; // how often the sensor data is sent to the Cloud...don't want to waste BW unnecessarily
+    public String metaDataURL = "https://new-node-red-demo-kad.mybluemix.net/getmetadata";
+    public String apiString2 = ""; //unused
+    public String apiString3 = ""; //unused
+    public int dealDistance = 200; // notify user of the deal when you are within X meters
+    public int maxDealLength = 30; // don't play this deal if the string is too long
+    public int couponAlertDistanceMeters = 4000; //200; // notify user that they have a coupon when you are within X meters
+    public int localBusinessSearchRadius = 4000; //500; // search for business locations which will accept your coupon within X meters
+
+
+    /**
+     * Called when the application is created. Initializes the application.
+     */
+    @Override
+    public void onCreate() {
+        Log.d(TAG, ".onCreate() entered");
+        super.onCreate();
+
+        settings = getSharedPreferences(Constants.SETTINGS, 0);
+        HashMap hash = getSettings();
+        dealDistance = Utility.parseInt(hash.get("deal_alert_distance").toString());
+        maxDealLength = Utility.parseInt(hash.get("max_deal_length").toString());
+        couponAlertDistanceMeters = Utility.parseInt(hash.get("coupon_alert_distance").toString());
+        localBusinessSearchRadius = Utility.parseInt(hash.get("local_business_search_radius").toString());
+
+        new ConnectToCloudant().execute("");
+
+        this.setDeviceId("iot-starter-android");
+        this.setOrganization("3alh1w");
+        this.setAuthToken("iot-starter-android");
+
+        loadProfiles();
+
+        /*
+        try {
+            BMSClient.getInstance().initialize(getApplicationContext(), "http://sharp-kad-demo.mybluemix.net", "0e3e5370-d7ee-43a0-8581-c429b256c0f7");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        */
+        com.ibm.mqa.config.Configuration configuration = new com.ibm.mqa.config.Configuration.Builder(this)
+                .withAPIKey(APP_KEY) //Provides the quality assurance application APP_KEY
+                .withMode(MQA.Mode.QA) //Selects the quality assurance application mod
+                .withReportOnShakeEnabled(true) //Enables shake report trigger
+                .build();
+        MQA.startNewSession(this, configuration);
+
+        //enablePush(true);
+        /* KAD added May 30th to have tts.speak adjustable by sound buttons */
+        AudioManager am = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        int amStreamMusicMaxVol = am.getStreamMaxVolume(am.STREAM_MUSIC);
+        am.setStreamVolume(am.STREAM_MUSIC, amStreamMusicMaxVol, 0);
+
+        String url = "http://new-node-red-demo-kad.mybluemix.net/businessesInArea";
+
+        JsonArrayRequest jsonObjectRequest = new JsonArrayRequest
+                (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        //mTextView.setText("Response: " + response.toString());
+                        Log.d("debugme", "Response: " + response.toString());
+                        localBusinesses = response;
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // TODO: Handle error
+                        Log.d("debugme", error.getMessage());
+
+                    }
+                });
+        RequestQueueSingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
+
+    }
+
+
+    /**
+     * Initializes Push and registers the device. Uses a callback to the MainActivity to maintain proper UI.
+     */
+    /*
+    public void enablePush(boolean enable) {
+        MFPPush.getInstance().initialize(getApplicationContext());
+        MFPPush push = MFPPush.getInstance();
+        Log.d("IN HERE", "IN HERE");
+        MFPPushResponseListener listener = new MFPPushResponseListener<String>() {
+            @Override
+            public void onSuccess(String s) {
+                //cb.success(s);
+                Log.d(TAG, "on Success");
+            }
+
+            @Override
+            public void onFailure(MFPPushException e) {
+                //cb.error(e);
+                Log.d(TAG, "on Failure");
+            }
+        };
+
+        if (enable) {
+            Log.d(TAG, "Registering");
+            push.register(listener);
+        } else {
+            push.unregister(listener);
+        }
+    }
+    */
+
+    /**
+     * Called when old application stored settings values are found.
+     * Converts old stored settings into new profile setting.
+     */
+    private void createNewDefaultProfile() {
+        Log.d(TAG, "organization not null. compat profile setup");
+        // If old stored property settings exist, use them to create a new default profile.
+        String organization = settings.getString(Constants.ORGANIZATION, null);
+        String deviceId = settings.getString(Constants.DEVICE_ID, null);
+        String authToken = settings.getString(Constants.AUTH_TOKEN, null);
+        IoTProfile newProfile = new IoTProfile("default", organization, deviceId, authToken);
+        this.profiles.add(newProfile);
+        this.profileNames.add("default");
+
+        // Put the new profile into the store settings and remove the old stored properties.
+        Set<String> defaultProfile = newProfile.convertToSet();
+
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putStringSet(newProfile.getProfileName(), defaultProfile);
+        editor.remove(Constants.ORGANIZATION);
+        editor.remove(Constants.DEVICE_ID);
+        editor.remove(Constants.AUTH_TOKEN);
+        editor.commit();
+
+        this.setProfile(newProfile);
+        this.setOrganization(newProfile.getOrganization());
+        this.setDeviceId(newProfile.getDeviceID());
+        this.setAuthToken(newProfile.getAuthorizationToken());
+
+        return;
+    }
+
+    /**
+     * Load existing profiles from application stored settings.
+     */
+    private void loadProfiles() {
+        // Compatability
+        if (settings.getString(Constants.ORGANIZATION, null) != null) {
+            createNewDefaultProfile();
+            return;
+        }
+
+        String profileName;
+        if ((profileName = settings.getString("iot:selectedprofile", null)) == null) {
+            profileName = "";
+        }
+
+        Map<String, ?> profileList = settings.getAll();
+        if (profileList != null) {
+            for (String key : profileList.keySet()) {
+                if (key.equals("iot:selectedprofile")) {
+                    continue;
+                }
+                Set<String> profile;// = new HashSet<String>();
+                try {
+                    // If the stored property is a Set<String> type, parse the profile and add it to the list of
+                    // profiles.
+                    if ((profile = settings.getStringSet(key, null)) != null) {
+                        Log.d(TAG, "profile name: " + key);
+                        IoTProfile newProfile = new IoTProfile(profile);
+                        this.profiles.add(newProfile);
+                        this.profileNames.add(newProfile.getProfileName());
+
+                        if (newProfile.getProfileName().equals(profileName)) {
+                            this.setProfile(newProfile);
+                            this.setOrganization(newProfile.getOrganization());
+                            this.setDeviceId(newProfile.getDeviceID());
+                            this.setAuthToken(newProfile.getAuthorizationToken());
+                        }
+                    }
+                } catch (Exception e) {
+                    continue;
+                }
+            }
+        }
+    }
+
+    /**
+     * Enables or disables the publishing of accelerometer data
+     */
+    public void toggleAccel() {
+        this.setAccelEnabled(!this.isAccelEnabled());
+        if (connected && accelEnabled) {
+            // Device Sensor was previously disabled, and the device is connected, so enable the sensor
+            if (deviceSensor == null) {
+                deviceSensor = DeviceSensor.getInstance(this);
+            }
+            deviceSensor.enableSensor();
+        } else if (connected && !accelEnabled) {
+            // Device Sensor was previously enabled, and the device is connected, so disable the sensor
+            if (deviceSensor != null) {
+                deviceSensor.disableSensor();
+            }
+        }
+    }
+
+    /**
+     * Turn flashlight on or off when a light command message is received.
+     */
+    public void handleLightMessage() {
+        Log.d(TAG, ".handleLightMessage() entered");
+        if (this.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) {
+
+            if (!isCameraOn) {
+                Log.d(TAG, "FEATURE_CAMERA_FLASH true");
+
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    android.hardware.camera2.CameraManager camManager = (CameraManager) getSystemService(android.content.Context.CAMERA_SERVICE);
+                    String cameraId = null; // Usually back camera is at 0 position.
+                    try {
+                        cameraId = camManager.getCameraIdList()[0];
+                        camManager.setTorchMode(cameraId, true);   //Turn ON
+                    } catch (CameraAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+               else {
+                   camera = Camera.open();
+                   Camera.Parameters p = camera.getParameters();
+                   p.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+                   camera.setParameters(p);
+                   camera.startPreview();
+               }
+                isCameraOn = true;
+            } else {
+                Log.d(TAG, "isCameraOn true");
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                {
+                    android.hardware.camera2.CameraManager camManager = (CameraManager) getSystemService(android.content.Context.CAMERA_SERVICE);
+                    String cameraId = null; // Usually back camera is at 0 position.
+                    try {
+                        cameraId = camManager.getCameraIdList()[0];
+                        camManager.setTorchMode(cameraId, false);   //Turn ON
+                    } catch (CameraAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else
+                {
+                    camera.stopPreview();
+                    camera.release();
+                }
+                isCameraOn = false;
+            }
+        } else {
+            Log.d(TAG, "FEATURE_CAMERA_FLASH false");
+        }
+    }
+
+    /**
+     * Overwrite an existing profile in the stored application settings.
+     *
+     * @param newProfile The profile to save.
+     */
+    public void overwriteProfile(IoTProfile newProfile) {
+        // Put the new profile into the store settings and remove the old stored properties.
+        Set<String> profileSet = newProfile.convertToSet();
+
+        SharedPreferences.Editor editor = settings.edit();
+        editor.remove(newProfile.getProfileName());
+        editor.putStringSet(newProfile.getProfileName(), profileSet);
+        editor.commit();
+
+        for (IoTProfile existingProfile : profiles) {
+            if (existingProfile.getProfileName().equals(newProfile.getProfileName())) {
+                profiles.remove(existingProfile);
+                break;
+            }
+        }
+        profiles.add(newProfile);
+    }
+    public HashMap getSettings()
+    {
+        HashMap hash = new HashMap();
+        try {
+            hash.put("coupon_alert_distance", settings.getInt("coupon_alert_distance", 200) + "");
+            hash.put("deal_alert_distance", settings.getInt("deal_alert_distance", 200) + "");
+            hash.put("max_deal_length", settings.getInt("max_deal_length", 30) + "");
+            hash.put("local_business_search_radius", settings.getInt("local_business_search_radius", 400) + "");
+
+        } catch (Exception e)
+        {
+            Log.e("debugme", "Issues with getSettings()", e);
+
+        }
+        return hash;
+    }
+
+    public void saveSettings(int coupon_alert_distance, int deal_alert_distance, int max_deal_length, int local_business_search_radius)
+    {
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putInt("coupon_alert_distance", coupon_alert_distance);
+        editor.putInt("deal_alert_distance", deal_alert_distance);
+        editor.putInt("max_deal_length", max_deal_length);
+        editor.putInt("local_business_search_radius", local_business_search_radius);
+        dealDistance = deal_alert_distance;
+        maxDealLength = max_deal_length;
+        couponAlertDistanceMeters = coupon_alert_distance;
+        localBusinessSearchRadius = local_business_search_radius;
+
+        editor.commit();
+    }
+
+    /**
+     * Save the profile to the application stored settings.
+     *
+     * @param profile The profile to save.
+     */
+    public void saveProfile(IoTProfile profile) {
+        // Put the new profile into the store settings and remove the old stored properties.
+        Set<String> profileSet = profile.convertToSet();
+
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putStringSet(profile.getProfileName(), profileSet);
+        editor.commit();
+        this.profiles.add(profile);
+        this.profileNames.add(profile.getProfileName());
+    }
+
+    /**
+     * Remove all saved profile information.
+     */
+    public void clearProfiles() {
+        this.profiles.clear();
+        this.profileNames.clear();
+
+        SharedPreferences.Editor editor = settings.edit();
+        editor.clear();
+        editor.commit();
+    }
+
+    // Getters and Setters
+    public String getCurrentRunningActivity() {
+        return currentRunningActivity;
+    }
+
+    public void setCurrentRunningActivity(String currentRunningActivity) {
+        this.currentRunningActivity = currentRunningActivity;
+    }
+
+    public String getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(String organization) {
+        this.organization = organization;
+    }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
+    }
+
+    public String getAuthToken() {
+        return authToken;
+    }
+
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
+    }
+
+    public void setConnectionType(Constants.ConnectionType type) {
+        this.connectionType = type;
+    }
+
+    public Constants.ConnectionType getConnectionType() {
+        return this.connectionType;
+    }
+
+    public boolean isConnected() {
+        return connected;
+    }
+
+    public void setConnected(boolean connected) {
+        this.connected = connected;
+    }
+
+    public int getPublishCount() {
+        return publishCount;
+    }
+
+    public void setPublishCount(int publishCount) {
+        this.publishCount = publishCount;
+    }
+
+    public int getReceiveCount() {
+        return receiveCount;
+    }
+
+    public void setReceiveCount(int receiveCount) {
+        this.receiveCount = receiveCount;
+    }
+
+    public int getUnreadCount() {
+        return unreadCount;
+    }
+
+    public void setUnreadCount(int unreadCount) {
+        this.unreadCount = unreadCount;
+    }
+
+    public int getColor() {
+        return color;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
+    }
+
+    public float[] getAccelData() {
+        return accelData;
+    }
+
+    ;
+
+    public void setAccelData(float[] accelData) {
+        this.accelData = accelData.clone();
+    }
+
+    public ArrayList<String> getMessageLog() {
+        return messageLog;
+    }
+
+    public boolean isAccelEnabled() {
+        return accelEnabled;
+    }
+
+    public void setAccelEnabled(boolean accelEnabled) {
+        this.accelEnabled = accelEnabled;
+    }
+
+    public DeviceSensor getDeviceSensor() {
+        return deviceSensor;
+    }
+
+    public void setDeviceSensor(DeviceSensor deviceSensor) {
+        this.deviceSensor = deviceSensor;
+    }
+
+    public Location getCurrentLocation() {
+        if (currentLocation == null) {
+
+        }
+        return currentLocation;
+    }
+
+    public void setCurrentLocation(Location currentLocation) {
+        this.currentLocation = currentLocation;
+    }
+
+    public void setGoogleMap(GoogleMap map) {
+        this.googleMap = map;
+    }
+
+    public GoogleMap getGoogleMap() {
+        return googleMap;
+    }
+
+    public void setMapMarker(Marker marker) {
+        this.marker = marker;
+    }
+
+    public Marker getMapMarker() {
+        return marker;
+    }
+
+    public Marker getMapMarker(String user) {
+        return markers.get(user);
+    }
+
+    public void setCurrentUser(String user)
+    {
+        currentUser = user;
+    }
+    public String getCurrentUser()
+    {
+        return currentUser;
+    }
+
+    public void setCouponCompanies(Vector companies)
+    {
+        couponCompanies = companies;
+    }
+    public Vector getCouponCompanies()
+    {
+        return couponCompanies;
+    }
+
+    public HashMap<String,Marker> getMapMarkers()  { return markers; }
+    public void addMapMarker(String user, Marker marker) {
+        //if (!markers.containsKey(user))
+            markers.put(user, marker);
+        Log.d(TAG, "POOPOO - " + markers.toString());
+        Log.d(TAG, "POOPOO - " + markers.size());
+    }
+
+    public Bitmap getMapBitmap(String user)  {
+        Log.d(TAG, "POOPOO - " + user);
+        if (!bitmaps.containsKey(user))
+        {
+            bitmaps.put(user, getBitmapFromURL("http://www.graphicsfuel.com/wp-content/uploads/2011/12/search-icon-512.png"));
+            Log.d(TAG, "POOPOO AFTER - " + user);
+
+        }
+        Log.d(TAG, "POOPOO - " + bitmaps.toString());
+        Log.d(TAG, "POOPOO - " + bitmaps.size());
+        return bitmaps.get(user);
+    }
+    public void addMapBitmap(String user, Bitmap bitmap) {
+        //if (!markers.containsKey(user))
+        bitmaps.put(user, bitmap);
+        Log.d(TAG, "POOPOO - " + bitmaps.toString());
+        Log.d(TAG, "POOPOO - " + bitmaps.size());
+    }
+    public IoTProfile getProfile() {
+        return profile;
+    }
+
+    public void setProfile(IoTProfile profile) {
+        this.profile = profile;
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("iot:selectedprofile", profile.getProfileName());
+        editor.commit();
+    }
+
+    public List<IoTProfile> getProfiles() {
+        return profiles;
+    }
+
+    public ArrayList<String> getProfileNames() {
+        return profileNames;
+    }
+
+    public Bitmap getBitmapFromURL(String imageUrl) {
+        try {
+            URL url = new URL(imageUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream input = connection.getInputStream();
+            Bitmap myBitmap = BitmapFactory.decodeStream(input);
+            return myBitmap;
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e(TAG, "POOPOO", e);
+            return null;
+        }
+    }
+    private void checkGPSStatus() {
+        LocationManager locationManager = null;
+        boolean gps_enabled = false;
+        boolean network_enabled = false;
+        if ( locationManager == null ) {
+            locationManager = (LocationManager) getSystemService(getApplicationContext().LOCATION_SERVICE);
+        }
+        try {
+            gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        } catch (Exception ex){}
+        try {
+            network_enabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        } catch (Exception ex){}
+/*
+        if ( !gps_enabled && !network_enabled ){
+            AlertDialog.Builder dialog = new AlertDialog.Builder(MyActivity.this);
+            dialog.setMessage("GPS not enabled");
+            dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    //this will navigate user to the device location settings screen
+                    Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    startActivity(intent);
+                }
+            });
+            AlertDialog alert = dialog.create();
+            alert.show();
+        }
+        */
+
+    }
+    private class ConnectToCloudant extends AsyncTask<String, Void, String> {
+        CloudantClient client = null;
+        @Override
+
+        protected String doInBackground(String... params) {
+            try {
+                //CloudantClient client = ClientBuilder.url(new URL("https://ddc1728e-316e-4a3e-a75e-e85be80a4e99-bluemix.cloudant.com"))
+                client = ClientBuilder.account("ddc1728e-316e-4a3e-a75e-e85be80a4e99-bluemix")
+                        .username("ddc1728e-316e-4a3e-a75e-e85be80a4e99-bluemix")
+                        .password("44ea0e6682c63ea1e73b24c2fe1bf5b1a37c4e2ad205bb612a54d1d2e81d40ad")
+                        .build();
+                if (client != null) Log.d(TAG, "Cloudant Client initialized");
+                if (true)
+                {
+
+// Note: for Cloudant Local or Apache CouchDB use:
+// ClientBuilder.url(new URL("yourCloudantLocalAddress.example"))
+//              .username("exampleUser")
+//              .password("examplePassword")
+//              .build();
+
+                    if (client != null) {
+// Show the server version
+                        Log.d(TAG, "KAD Server Version: " + client.serverVersion());
+
+// Get a List of all the databases this Cloudant account
+
+                        List<String> databases = client.getAllDbs();
+                        Log.d(TAG, "KAD All my databases : ");
+                        for (String db : databases) {
+                            Log.d(TAG, "KAD " + db);
+                        }
+                        // Create an ExampleDocument and save it in the database
+                        //db.(new ExampleDocument(true));
+                        //System.out.println("You have inserted the document");
+
+
+                        // Get an ExampleDocument out of the database and deserialize the JSON into a Java type
+                        db2 = client.database("deals", false);
+                        userDB = client.database("user", false);
+                        User user = userDB.find(User.class, "504a3f503e8fb66097a4bf89b4827f70");
+
+                         Log.d(TAG, "Auth Token = " + user.getAuthToken());
+                        Log.d(TAG, "User Record = " + user.toString());
+                        //appUser = user;
+                        //appImage = userDB.
+                        Log.d(TAG, "appUser = " + appUser);
+                        //ExampleDocument doc = db2.find(ExampleDocument.class, "example_id");
+                        //List l = db2.listIndices();
+                        List l = db2.getAllDocsRequestBuilder().build().getResponse().getDocIds();
+                        for (int y=0;y < l.size();y++) {
+                            Log.d(TAG, y + ") KAD cloudant " + l.get(y));
+                            Deal deal = db2.find(Deal.class, l.get(y).toString());
+                            String newCompanyToAdd = deal.getCompanyName();
+                            if (newCompanyToAdd != null) {
+                                newCompanyToAdd = newCompanyToAdd.replaceAll("'", ""); // Added for McDonalds...need to figure out better way
+                                if (!couponCompanies.contains(newCompanyToAdd))
+                                    couponCompanies.add(newCompanyToAdd);
+                            }
+                            dealLocations.add(deal);
+
+                            Log.d(TAG, "KAD cloudant " + deal.toString());
+
+
+                        }
+
+                        //Log.d(TAG, doc);
+                    } else {
+                        Log.d(TAG, "KAD cloudant client didn't initialize");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.d(TAG, "KAD " + ex.getMessage());
+                ex.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+        }
+
+        @Override
+        protected void onPreExecute() {
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+        }
+    }
+    public void playDeals() {
+        String phrase = "";
+        getAllSms(getApplicationContext());
+
+        for (int x = 0; x < dealLocations.size(); x++) {
+            Deal deal = (Deal) dealLocations.elementAt(x);
+            phrase = deal.getDeal();
+            try {
+                Log.i("debugme", phrase);
+            } catch (Exception e) {
+
+            }
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    //engine.speak(phrase, TextToSpeech.QUEUE_FLUSH, null, null);
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Couldn't play Deals", e);
+            }
+
+        }
+
+
+    }
+    public void playCouponNotices() {
+        String phrase = "";
+
+        for (int x = 0; x < dealLocations.size(); x++) {
+            Deal deal = (Deal) dealLocations.elementAt(x);
+            phrase = deal.getDeal();
+            if (deal.getCouponExpirationDays() != null && deal.getCouponExpirationDays().equals("30")) {
+                Log.d(TAG, "KAD cloudant " + deal.getCouponExpirationDays());
+                engine.speak("Testing", TextToSpeech.QUEUE_FLUSH, null, null);
+                Log.d(TAG, "KAD cloudant in here");
+            }
+        }
+
+
+    }
+    void editSearchCriteria()
+    {
+
+    }
+    public String GET(String url){
+        InputStream inputStream = null;
+        String result = "";
+        try {
+
+            // create HttpClient
+            HttpClient httpclient = new DefaultHttpClient();
+
+            // make GET request to the given URL
+            HttpResponse httpResponse = httpclient.execute(new HttpGet(url));
+
+            // receive response as inputStream
+            inputStream = httpResponse.getEntity().getContent();
+
+            // convert inputstream to string
+            if(inputStream != null)
+                result = convertInputStreamToString(inputStream);
+            else
+                result = "Did not work!";
+            Log.d("debugmebefore",result);
+
+        } catch (Exception e) {
+            Log.d("debugme", e.getLocalizedMessage());
+        }
+
+        return result;
+    }
+    public void getAllSms(Context context) {
+
+        ContentResolver cr = context.getContentResolver();
+        Cursor c = cr.query(Telephony.Sms.CONTENT_URI, null, null, null, null);
+        int totalSMS = 0;
+        if (c != null) {
+            totalSMS = c.getCount();
+            if (c.moveToFirst()) {
+                //for (int j = 0; j < totalSMS; j++) {
+                for (int j = 0; j < 1; j++) {
+                    String smsDate = c.getString(c.getColumnIndexOrThrow(Telephony.Sms.DATE));
+                    String number = c.getString(c.getColumnIndexOrThrow(Telephony.Sms.ADDRESS));
+                    String body = c.getString(c.getColumnIndexOrThrow(Telephony.Sms.BODY));
+                    Log.d("debugme", "SMS Message = " + body);
+                    try {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            Log.d("debugme", "SMS Message playing message");
+                            engine.speak(body, TextToSpeech.QUEUE_FLUSH, null, null);
+                            Log.d("debugme", "SMS Message IN HERE");
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, "Couldn't play Deals", e);
+                    }
+                    Date dateFormat= new Date(Long.valueOf(smsDate));
+                    String type;
+                    switch (Integer.parseInt(c.getString(c.getColumnIndexOrThrow(Telephony.Sms.TYPE)))) {
+                        case Telephony.Sms.MESSAGE_TYPE_INBOX:
+                            type = "inbox";
+                            break;
+                        case Telephony.Sms.MESSAGE_TYPE_SENT:
+                            type = "sent";
+                            break;
+                        case Telephony.Sms.MESSAGE_TYPE_OUTBOX:
+                            type = "outbox";
+                            break;
+                        default:
+                            break;
+                    }
+
+
+                    c.moveToNext();
+                }
+            }
+
+            c.close();
+
+        } else {
+            Toast.makeText(this, "No message to show!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    private static String convertInputStreamToString(InputStream inputStream) throws IOException{
+        BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(inputStream));
+        String line = "";
+        String result = "";
+        while((line = bufferedReader.readLine()) != null)
+            result += line;
+
+        inputStream.close();
+        return result;
+
+    }
+    private class HttpAsyncTask extends AsyncTask<String, Void, String> {
+        IoTStarterApplication _app = null;
+
+
+        @Override
+        protected String doInBackground(String... urls) {
+            Log.d("debugme", " IN ASYNC KAD");
+            String result = GET(urls[0]);
+            try {
+                //KAD NEED TO FIX appUser = new JSONArray(result).getJSONObject(0);
+
+                //Log.d("debugme", appUser.getString("name"));
+            } catch (Exception e) {
+                Log.e("debugme", "IN HERE", e);
+            }
+            //Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_LONG).show();
+            //Log.d("debugmeafter", appUser.toString());
+            return ""; // appUser.toString();
+
+        }
+
+        // onPostExecute displays the results of the AsyncTask.
+        @Override
+        protected void onPostExecute(String result) {
+            try {
+                appUser = new JSONObject(result);
+Log.d("debugme", "onPostExecute " + appUser.toString());
+                //Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_LONG).show();
+                Log.d(TAG, appUser.toString());
+            } catch (Exception e)
+            {
+                Log.e(TAG, "Error", e);
+            }
+        }
+    }
+
+
+
+}
