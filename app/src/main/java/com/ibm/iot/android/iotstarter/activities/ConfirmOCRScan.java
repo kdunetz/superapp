@@ -1,9 +1,11 @@
 package com.ibm.iot.android.iotstarter.activities;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
@@ -51,6 +53,7 @@ public class ConfirmOCRScan extends Activity {
             final EditText numberDays = (EditText) findViewById(R.id.num_days);
             final EditText couponExpirationDays = (EditText) findViewById(R.id.coupon_expiration_date_value);
 
+
             companyName.setText(Utility.getJSONString(jsonObj, "company_name"));
             ocr.setText(Utility.getJSONString(jsonObj, "deal"));
             website.setText(Utility.getJSONString(jsonObj, "website"));
@@ -61,7 +64,7 @@ public class ConfirmOCRScan extends Activity {
 
             numberDays.setText(Utility.getJSONString(jsonObj, "num_days"));
             Log.d("debugme", "coupon days" + (Utility.getJSONString(jsonObj, "coupon_expiration_days")));
-            couponExpirationDays.setText((Utility.getJSONString(jsonObj, "coupon_expiration_days")));
+            couponExpirationDays.setText((Utility.getJSONString(jsonObj, "coupon_expiration_days", "30")));
 
             /*
             Button websiteButton = (Button)findViewById((R.id.website_button));
@@ -91,35 +94,65 @@ public class ConfirmOCRScan extends Activity {
                 public void onClick(View v) {
                     // TODO Auto-generated method stub
                     try {
-                        String username = "";
-                        if (app != null && app.appUser != null)
-                            username = app.appUser.getString("username");
-                        jsonObj.put("user_name", username);
-                        jsonObj.put("company_name", companyName.getText().toString());
-                        jsonObj.put("deal", ocr.getText().toString());
-                        jsonObj.put("website", website.getText().toString());
-                        jsonObj.put("promo_code", promoCode.getText().toString());
-                        jsonObj.put("date", date.getText().toString());
-                        jsonObj.put("num_days", numberDays.getText().toString());
-                        jsonObj.put("coupon_expiration_days", couponExpirationDays.getText().toString());
-                        if (jsonObj.get("website").toString().length() == 0 &&
-                            jsonObj.get("promo_code").toString().length() == 0 &&
-                            jsonObj.get("num_days").toString().length() == 0)
+                        boolean error = false;
+                        if (companyName.getText().toString().length() == 0)
+                            error = true;
+                        if (ocr.getText().toString().length() == 0)
+                            error = true;
+                        if (couponExpirationDays.getText().toString().length() == 0)
+                            error = true;
+                        if (date.getText().toString().length() == 0)
+                            error = true;
+
+                        if (error)
                         {
-                            jsonObj.put("play_sides", 1);
+                            AlertDialog.Builder dialog = new AlertDialog.Builder(ConfirmOCRScan.this);
+                            dialog.setMessage("Please enter all required fields");
+                            //dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+
+                            //    @Override
+                            //   public void onClick(DialogInterface dialog, int which) {
+                                    //this will navigate user to the device location settings screen
+                            //        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                            //        startActivity(intent);
+                            //    }
+                            //});
+                            AlertDialog alert = dialog.create();
+                            alert.show();
                         }
-                        jsonObj.put("_type", "receipt");
+                        else
+                        {
+
+                            String username = "";
+                            if (app != null && app.appUser != null)
+                                username = app.appUser.getString("username");
+                            jsonObj.put("username", username);
+                            jsonObj.put("company_name", companyName.getText().toString());
+                            jsonObj.put("deal", ocr.getText().toString());
+                            jsonObj.put("website", website.getText().toString());
+                            jsonObj.put("promo_code", promoCode.getText().toString());
+                            jsonObj.put("date", date.getText().toString());
+                            jsonObj.put("num_days", numberDays.getText().toString());
+                            jsonObj.put("coupon_expiration_days", couponExpirationDays.getText().toString());
+                            if (jsonObj.get("website").toString().length() == 0 &&
+                                jsonObj.get("promo_code").toString().length() == 0 &&
+                                jsonObj.get("num_days").toString().length() == 0)
+                            {
+                                jsonObj.put("play_sides", 1);
+                            }
+                            jsonObj.put("_type", "receipt");
 
 
-                        String url = "https://new-node-red-demo-kad.mybluemix.net/save?object_name=deal";
-_jsonObject = jsonObj;
-                        Utility.callRESTAPI(v.getContext(), url, "post", ACTION_FOR_SAVE_RESULT, jsonObj.toString());
+                            String url = "https://new-node-red-demo-kad.mybluemix.net/save?object_name=deal";
+    _jsonObject = jsonObj;
+                            Utility.callRESTAPI(v.getContext(), url, "post", ACTION_FOR_SAVE_RESULT, jsonObj.toString());
 
 
-                        Log.d(TAG, "KAD saved");
+                            Log.d(TAG, "KAD saved");
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
-                        Log.d(TAG, "KAD CRASH");
+                        Log.e(TAG, "KAD CRASHED", e);
                     }
                     //System.out.println("You have inserted the document");
                 }
@@ -212,13 +245,19 @@ _jsonObject = jsonObj;
                             promoCodeString = "&CN1=" + list[0] + "&CN2=" + list[1] + "&CN3=" + list[2] + "&CN4=" + list[3];
 
                     }
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse((url.indexOf("http") < 0?"http:////":"") + url +  promoCodeString));
-                    startActivity(browserIntent);
+                    if (url.length() > 0) {
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse((url.indexOf("http") < 0 ? "http:////" : "") + url + promoCodeString));
+                        startActivity(browserIntent);
+                    }
+                    else
+                    {
+                        ((Activity)context).finish();
+                    }
                 }catch (Exception e)
                 {
                     Log.e("debugme", "IN HERE", e);
                 }
-                finish();
+                ((Activity)context).finish();
             }
         }
     };

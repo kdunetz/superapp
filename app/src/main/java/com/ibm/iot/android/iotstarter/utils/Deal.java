@@ -19,7 +19,7 @@ public class Deal {
     private String num_days = null;
     private String coupon_expiration_days = null;
     private String creation_date = Utility.getCurrentDateTime();
-    private String user_name = "";
+    private String username = "";
     private String company_name = "";
 
     public Deal(boolean isExample) {
@@ -30,6 +30,7 @@ public class Deal {
     {
         return _id;
     }
+
     public String getType()
     {
         return _type;
@@ -38,14 +39,16 @@ public class Deal {
     {
         _type = inputType;
     }
+
     public String getUserName()
     {
-        return user_name;
+        return username;
     }
     public void setUserName(String userName)
     {
-        user_name = userName;
+        username = userName;
     }
+
     public String getCompanyName()
     {
         return company_name;
@@ -53,9 +56,10 @@ public class Deal {
     public void setCompanyName(String companyName) {
         company_name = companyName;
     }
+
     public double getLatitude()
     {
-        if (latitude != null)
+        if (latitude != null && latitude.length() > 0)
             return Double.parseDouble(latitude);
         else
             return -1;
@@ -64,9 +68,10 @@ public class Deal {
     {
         latitude = latitudeStr;
     }
+
     public double getLongitude()
     {
-        if (longitude != null)
+        if (longitude != null && longitude.length() > 0)
             return Double.parseDouble(longitude);
         else
             return -1;
@@ -75,6 +80,7 @@ public class Deal {
     {
         longitude = longitudeStr;
     }
+
     public String getDeal()
     {
         return deal;
@@ -83,14 +89,16 @@ public class Deal {
     {
         deal = dealStr;
     }
-    public void setLastSpoke(boolean value)
-    {
-        lastSpoke = value;
-    }
+
     public boolean getLastSpoke()
     {
         return lastSpoke;
     }
+    public void setLastSpoke(boolean value)
+    {
+        lastSpoke = value;
+    }
+
     public void setPlaySides(int ps)
     {
         playSides = ps;
@@ -119,7 +127,10 @@ public class Deal {
     }
     public String getCouponExpirationDays()
     {
-        return coupon_expiration_days;
+        if (coupon_expiration_days == null || coupon_expiration_days.length() == 0)
+            return "30";
+        else
+            return coupon_expiration_days;
     }
 
     public void setCouponExpirationDays(String couponExpirationDays)

@@ -28,9 +28,9 @@ import android.widget.EditText;
 import com.ibm.iot.android.iotstarter.IoTStarterApplication;
 import com.ibm.iot.android.iotstarter.R;
 import com.ibm.iot.android.iotstarter.activities.CameraActivity;
-import com.ibm.iot.android.iotstarter.activities.EditSearchCriteriaActivity;
 import com.ibm.iot.android.iotstarter.activities.AndroidBarcodeQrActivity;
 
+import com.ibm.iot.android.iotstarter.activities.ConfirmOCRScan;
 import com.ibm.iot.android.iotstarter.activities.MainActivity;
 import com.ibm.iot.android.iotstarter.activities.ProfilesActivity;
 import com.ibm.iot.android.iotstarter.activities.FindNeighborsActivity;
@@ -118,19 +118,12 @@ public class IoTStarterFragment extends Fragment {
             case R.id.action_accel:
                 app.toggleAccel();
                 return true;
-            case R.id.action_profiles:
-                openProfiles();
-                return true;
-
-            case R.id.action_clear_profiles:
-                app.clearProfiles();
-                return true;
-            case R.id.play_deals:
-                app.playDeals();
-                return true;
-            case R.id.edit_search_criteria:
-                editSearchCriteria();
-                return true;
+            //case R.id.action_profiles:
+            //    openProfiles();
+            //    return true;
+            //case R.id.action_clear_profiles:
+            //    app.clearProfiles();
+            //    return true;
             case R.id.qrcode_reader:
                 QRCodeReader();
                 return true;
@@ -153,6 +146,9 @@ public class IoTStarterFragment extends Fragment {
             case R.id.settings:
                 settings();
                 return true;
+            case R.id.create_coupon:
+                createCoupon();
+                return true;
             case R.id.clear:
                 app.setUnreadCount(0);
                 app.getMessageLog().clear();
@@ -167,11 +163,7 @@ public class IoTStarterFragment extends Fragment {
                 }
         }
     }
-    protected void editSearchCriteria() {
-        Log.d(TAG, ".editSearchCriteria() entered");
-        Intent editSearchCriteriaIntent = new Intent(getActivity().getApplicationContext(), EditSearchCriteriaActivity.class);
-        startActivity(editSearchCriteriaIntent);
-    }
+
     protected void QRCodeReader() {
         Log.d(TAG, ".QRCodeReader() entered");
         Intent qrCodeReaderIntent = new Intent(getActivity().getApplicationContext(), AndroidBarcodeQrActivity.class);
@@ -181,6 +173,21 @@ public class IoTStarterFragment extends Fragment {
         Log.d(TAG, ".findNeighbors() entered");
         Intent findNeighborsIntent = new Intent(getActivity().getApplicationContext(), FindNeighborsActivity.class);
         startActivity(findNeighborsIntent);
+    }
+    protected void createCoupon() {
+        Log.d(TAG, ".createCoupon() entered");
+        try {
+            Intent dynamicFormIntent = new Intent(getActivity().getApplicationContext(), ConfirmOCRScan.class);
+            Bundle b = new Bundle();
+            b.putString("json", "{}");
+            dynamicFormIntent.putExtras(b);
+            startActivity(dynamicFormIntent,b);
+        }
+        catch (Exception e)
+        {
+            Log.e(TAG, "BLAHBLAH", e);
+            e.printStackTrace();
+        }
     }
     protected void dynamicForm() {
         Log.d(TAG, ".dynamicForm() entered");

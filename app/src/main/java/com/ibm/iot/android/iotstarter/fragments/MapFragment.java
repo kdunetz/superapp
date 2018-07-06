@@ -58,6 +58,7 @@ public class MapFragment extends IoTStarterFragment implements OnMapReadyCallbac
 
         // Gets the MapView from the XML layout and creates it
         mapView = (MapView) v.findViewById(R.id.mapview);
+
         final Button button = (Button) v.findViewById(R.id.setRangeButton);
         button.setVisibility(Button.VISIBLE);
         button.setOnClickListener(new Button.OnClickListener() {
@@ -134,6 +135,25 @@ public class MapFragment extends IoTStarterFragment implements OnMapReadyCallbac
 
             }
         });
+        final Button recenter = (Button) v.findViewById(R.id.recenter);
+        recenter.setVisibility(Button.VISIBLE);
+        recenter.setOnClickListener(new Button.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                // Getting latitude of the current location
+                double latitude = app.getCurrentLocation().getLatitude();
+
+                // Getting longitude of the current location
+                double longitude = app.getCurrentLocation().getLongitude();
+
+                LatLng latLng = new LatLng(latitude, longitude);
+                CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(latLng);
+
+                mMap.animateCamera(cameraUpdate);
+            };
+        });
+
 
         mapView.onCreate(savedInstanceState);
 
@@ -271,7 +291,7 @@ public class MapFragment extends IoTStarterFragment implements OnMapReadyCallbac
         if (location != null) {
             LatLng position = new LatLng(location.getLatitude(), location.getLongitude());
             Marker marker = mMap.addMarker(new MarkerOptions().position(position).icon(newBitmap).title(app.getCurrentUser()));
-            app.addMapMarker(app.getCurrentUser(), marker);
+            app.addMapMarker(app.getCurrentUser(), marker); /* save in global variable so we can remove it later when we move */
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 17));
             Utility.getPeopleInArea(mapView.getContext(), app, location);
             Utility.loadLocalBusinesses(mapView.getContext(), app, location);

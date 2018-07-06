@@ -256,8 +256,9 @@ Log.d("debugme", locationChangedCounter + "");
                 app.appUser.put("latitude", location.getLatitude() + "");
                 app.appUser.put("longitude", location.getLongitude() + "");
                 Log.d("debugme", "Trying to save current location for user - " + app.appUser);
+                Utility.saveUser(context, app);
 
-                Utility.callRESTAPI(context, url, "post", "XXX", app.appUser.toString());
+                // OLD WAY Utility.callRESTAPI(context, url, "post", "XXX", app.appUser.toString());
             } catch (Exception e)
             {
                 Log.e("debugme", "Problem saving user location", e);
@@ -314,7 +315,7 @@ Log.d("debugme", locationChangedCounter + "");
                 }
             }
         } catch (Exception e) {
-            Log.d(TAG, "CRASHED");
+            Log.e(TAG, "CRASHED", e);
             e.printStackTrace();
         }
 
@@ -347,7 +348,11 @@ Log.d("debugme", "Found deal for " + companyName);
                             Log.d("debugme", "Found deal 4");
                             Log.d("debugme123", "Found deal before if statements :" + name + "," + companyName + "," + deal.getUserName() + "," + app.appUser.getString("username"));
 
-                            if (!name.equals(companyName)) continue;
+                            // OLD WAY if (!name.replaceAll("-", " ").toUpperCase().equals(companyName.toUpperCase().replaceAll("-", " "))) continue;
+                            if (!Utility.companyNameMatch(companyName,  name)) {
+                                Log.d("debug123", "companyMatch failed: " + companyName + "," + name);
+                                continue;
+                            }
 
                             String lat = jsonObject.getString("latitude");
                             String lon = jsonObject.getString("longitude");
@@ -388,7 +393,7 @@ Log.d("debugme123", lastSpoken.toString() + " --- " + lastSpoken.containsKey(dea
                             if (dist < app.couponAlertDistanceMeters && !lastSpoken.containsKey(deal.getID()+lat+lon)) {
                                 Log.d("debugme12345", "BEFORE x = " + x + ", dist = " + dist + "," + app.couponAlertDistanceMeters + ",near " + deal.toString());
 
-                                app.engine.speak(name + " near. You have a coupon", TextToSpeech.QUEUE_ADD, null, null);
+                                app.engine.speak(name + " near. You have a coupon: " + deal.getDeal(), TextToSpeech.QUEUE_ADD, null, null);
                                 Log.d("debugme1234", "x = " + x + ",IN HERE" + deal.getDeal());
                                 //deal.setLastSpoke(true);
                                 lastSpoken.put(deal.getID()+lat+lon, "true");
@@ -432,11 +437,14 @@ Log.d("debugme123", lastSpoken.toString() + " --- " + lastSpoken.containsKey(dea
 
             now = googleMap.addMarker(new MarkerOptions().icon(newBitmap).position(latLng).title(app.getCurrentUser()));
             app.addMapMarker(app.getCurrentUser(), now);
+
             // Showing the current location in Google Map
-            // KAD temp googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
 
             // Zoom in the Google Map
             // KAD took out annoying zoom googleMap.animateCamera(CameraUpdateFactory.zoomTo(17));
+
+
             if (false) {
                 //Calculate the markers to get their position
                 LatLngBounds.Builder b = new LatLngBounds.Builder();

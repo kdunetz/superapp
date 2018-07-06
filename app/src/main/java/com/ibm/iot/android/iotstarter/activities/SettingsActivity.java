@@ -1,6 +1,7 @@
 package com.ibm.iot.android.iotstarter.activities;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -9,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -23,7 +25,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 
-public class SettingsActivity extends Activity {
+public class SettingsActivity extends AppCompatActivity {
     private final static String TAG = SettingsActivity.class.getName();
     protected IoTStarterApplication app;
 
@@ -31,6 +33,7 @@ public class SettingsActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings);
+
         app = (IoTStarterApplication) getApplication();
 
         try {
@@ -39,7 +42,7 @@ public class SettingsActivity extends Activity {
             final EditText dealAlertDistance = (EditText) findViewById(R.id.deal_alert_distance);
             final EditText maxDealLength = (EditText) findViewById(R.id.max_deal_length);
             final EditText localBusinessSearchRadius = (EditText) findViewById(R.id.local_business_search_radius);
-
+            final EditText searchKeywords = (EditText) findViewById(R.id.search_key_words);
 
             if (app != null) {
                 HashMap hash = app.getSettings();
@@ -51,6 +54,8 @@ public class SettingsActivity extends Activity {
                     localBusinessSearchRadius.setText(hash.get("local_business_search_radius") + "");
                 }
             }
+            searchKeywords.setText(app.appUser.getString("search_key_words"));
+
             Button button = (Button) findViewById(R.id.save_settings);
             button.setOnClickListener(new Button.OnClickListener() {
 
@@ -58,9 +63,59 @@ public class SettingsActivity extends Activity {
                 public void onClick(View v) {
                     // TODO Auto-generated method stub
                     try {
-                        app.saveSettings(Utility.parseInt(couponAlertDistance.getText().toString()), Utility.parseInt(dealAlertDistance.getText().toString()), Utility.parseInt( maxDealLength.getText().toString()), Utility.parseInt(localBusinessSearchRadius.getText().toString()));
-                        finish();
-                        Log.d(TAG, "KAD saved");
+                        app.appUser.put("search_key_words", searchKeywords.getText().toString());
+                        // SAVE THING TO DATABASE
+                        Utility.saveUser(v.getContext(), app);
+/*
+                        String url = "https://new-node-red-demo-kad.mybluemix.net/save?object_name=object_one";
+                        try {
+                            Log.d("debugme", "Trying to save user - " + app.appUser);
+
+                            Utility.callRESTAPI(v.getContext(), url, "post", "XXX", app.appUser.toString());
+                        }
+                        catch (Exception e)
+                        {
+                            Log.e("debugme","Problem saving User record to database", e);
+                        }
+                        */
+                        if (app.saveSettings(Utility.parseInt(couponAlertDistance.getText().toString()), Utility.parseInt(dealAlertDistance.getText().toString()), Utility.parseInt( maxDealLength.getText().toString()), Utility.parseInt(localBusinessSearchRadius.getText().toString()))) {
+                            finish();
+                            Log.d(TAG, "KAD saved");
+                        }
+                        else
+                        {
+                            AlertDialog.Builder dialog = new AlertDialog.Builder(SettingsActivity.this);
+                            dialog.setMessage("Please enter values in all fields");
+                            //dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+
+                            //    @Override
+                            //   public void onClick(DialogInterface dialog, int which) {
+                            //this will navigate user to the device location settings screen
+                            //        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                            //        startActivity(intent);
+                            //    }
+                            //});
+                            AlertDialog alert = dialog.create();
+                            alert.show();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Log.e(TAG, "KAD CRASH", e);
+                    }
+                    //System.out.println("You have inserted the document");
+                }
+            });
+            Button resetSettingsButton = (Button) findViewById(R.id.reset_settings);
+            resetSettingsButton.setOnClickListener(new Button.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    // TODO Auto-generated method stub
+                    try {
+                        couponAlertDistance.setText("200");
+                        dealAlertDistance.setText("200");
+                        maxDealLength.setText("30");
+                        localBusinessSearchRadius.setText("400");
                     } catch (Exception e) {
                         e.printStackTrace();
                         Log.e(TAG, "KAD CRASH", e);
@@ -79,6 +134,8 @@ public class SettingsActivity extends Activity {
         Log.d(TAG, ".onResume() entered");
 
         super.onResume();
+
+
 
     }
 

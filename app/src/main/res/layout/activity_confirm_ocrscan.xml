@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center|top"
         android:layout_margin="5dp"
-        android:text="Company Name"
+        android:text="Company Name (*)"
         android:textColor="#000000"
         android:textSize="12dp" />
 
@@ -44,7 +44,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center|top"
         android:layout_margin="5dp"
-        android:text="Description"
+        android:text="Description (*)"
         android:textColor="#000000"
         android:textSize="12dp" />
 
@@ -119,7 +119,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center|top"
         android:layout_margin="5dp"
-        android:text="Date"
+        android:text="Date (*)"
         android:textColor="#000000"
         android:textSize="12dp" />
 
@@ -168,11 +168,35 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center|top"
         android:layout_margin="5dp"
-        android:text="Coupon Expiration Days"
+        android:text="Coupon Expiration Days (*)"
         android:textColor="#000000"
         android:textSize="12dp" />
         <EditText
             android:id="@+id/coupon_expiration_date_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|top"
+            android:layout_margin="5dp"
+            android:text=""
+            android:textColor="#000000"
+            android:textSize="12dp" />
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_height="50dp"
+        android:layout_width="match_parent"
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/reward_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|top"
+            android:layout_margin="5dp"
+            android:text="Coupon Reward"
+            android:textColor="#000000"
+            android:textSize="12dp" />
+        <EditText
+            android:id="@+id/coupon_reward_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center|top"

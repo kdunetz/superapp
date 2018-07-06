@@ -201,11 +201,11 @@ public class LogFragment extends ListFragment {
         Log.d(TAG, ".onOptionsItemSelected() entered");
         // Handle presses on the action bar items
         switch (item.getItemId()) {
-            case R.id.action_profiles:
-                if (!ProfilesActivity.class.getName().equals(app.getCurrentRunningActivity())) {
-                    openProfiles();
-                }
-                return true;
+            //case R.id.action_profiles:
+            //    if (!ProfilesActivity.class.getName().equals(app.getCurrentRunningActivity())) {
+            //        openProfiles();
+            //    }
+            //    return true;
             case R.id.action_accel:
                 app.toggleAccel();
                 return true;

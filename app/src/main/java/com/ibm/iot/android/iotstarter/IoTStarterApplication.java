@@ -454,9 +454,12 @@ public class IoTStarterApplication extends Application {
         return hash;
     }
 
-    public void saveSettings(int coupon_alert_distance, int deal_alert_distance, int max_deal_length, int local_business_search_radius)
+    public boolean saveSettings(int coupon_alert_distance, int deal_alert_distance, int max_deal_length, int local_business_search_radius)
     {
         SharedPreferences.Editor editor = settings.edit();
+        if (coupon_alert_distance < 0 || deal_alert_distance < 0 || max_deal_length < 0 || local_business_search_radius < 0)
+            return false;
+
         editor.putInt("coupon_alert_distance", coupon_alert_distance);
         editor.putInt("deal_alert_distance", deal_alert_distance);
         editor.putInt("max_deal_length", max_deal_length);
@@ -467,6 +470,7 @@ public class IoTStarterApplication extends Application {
         localBusinessSearchRadius = local_business_search_radius;
 
         editor.commit();
+        return true;
     }
 
     /**
@@ -506,6 +510,10 @@ public class IoTStarterApplication extends Application {
         this.currentRunningActivity = currentRunningActivity;
     }
 
+    public void setAppUser(JSONObject app_user)
+    {
+        appUser = app_user;
+    }
     public String getOrganization() {
         return organization;
     }
@@ -802,9 +810,10 @@ public class IoTStarterApplication extends Application {
                         for (int y=0;y < l.size();y++) {
                             Log.d(TAG, y + ") KAD cloudant " + l.get(y));
                             Deal deal = db2.find(Deal.class, l.get(y).toString());
+
                             String newCompanyToAdd = deal.getCompanyName();
                             if (newCompanyToAdd != null) {
-                                newCompanyToAdd = newCompanyToAdd.replaceAll("'", ""); // Added for McDonalds...need to figure out better way
+                                newCompanyToAdd = newCompanyToAdd.replaceAll("'", "").replaceAll("-", " "); // Added for McDonalds...need to figure out better way
                                 if (!couponCompanies.contains(newCompanyToAdd))
                                     couponCompanies.add(newCompanyToAdd);
                             }
@@ -842,30 +851,7 @@ public class IoTStarterApplication extends Application {
         protected void onProgressUpdate(Void... values) {
         }
     }
-    public void playDeals() {
-        String phrase = "";
-        getAllSms(getApplicationContext());
 
-        for (int x = 0; x < dealLocations.size(); x++) {
-            Deal deal = (Deal) dealLocations.elementAt(x);
-            phrase = deal.getDeal();
-            try {
-                Log.i("debugme", phrase);
-            } catch (Exception e) {
-
-            }
-            try {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    //engine.speak(phrase, TextToSpeech.QUEUE_FLUSH, null, null);
-                }
-            } catch (Exception e) {
-                Log.e(TAG, "Couldn't play Deals", e);
-            }
-
-        }
-
-
-    }
     public void playCouponNotices() {
         String phrase = "";
 

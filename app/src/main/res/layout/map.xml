@@ -11,4 +11,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/add_location" />
+    <Button
+    android:id="@+id/recenter"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="@string/recenter" android:layout_alignParentRight="true"
+        />
 </RelativeLayout>

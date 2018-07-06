@@ -52,6 +52,7 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.ibm.iot.android.iotstarter.R;
@@ -189,6 +190,9 @@ public class Camera2BasicFragment extends Fragment
      */
    // private AutoFitTextureView mTextureView;
     private AutoFitTextureView mTextureView;
+
+    private ImageView mCameraImage; // KAD added July 3, 2018
+    private Bitmap mBitmapImage;
     /**
      * A {@link CameraCaptureSession } for camera preview.
      */
@@ -269,6 +273,8 @@ public class Camera2BasicFragment extends Fragment
 //            Bitmap bitmap = decodeFile(mFile);
 //           Log.d("debugme", bitmap.toString());
             Image image = reader.acquireNextImage();
+
+
             mBackgroundHandler.post(new ImageSaver(image, mFile));
 
             ByteBuffer buffer = image.getPlanes()[0].getBuffer();
@@ -278,6 +284,8 @@ public class Camera2BasicFragment extends Fragment
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, out);
             bitmapImage = BitmapFactory.decodeStream(new ByteArrayInputStream(out.toByteArray()));
+mBitmapImage = bitmapImage;
+
 
             Log.d("debugme", "Saved");
             String base64String = Utility.encodeTobase64(bitmapImage);
@@ -493,6 +501,8 @@ public class Camera2BasicFragment extends Fragment
         view.findViewById(R.id.info).setOnClickListener(this);
         //mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
         mTextureView = (AutoFitTextureView)view.findViewById(R.id.texture);
+        mCameraImage = (ImageView)view.findViewById(R.id.camera_image);
+
     }
 
     @Override
@@ -752,6 +762,11 @@ public class Camera2BasicFragment extends Fragment
             // We set up a CaptureRequest.Builder with the output Surface.
             mPreviewRequestBuilder
                     = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+
+            mPreviewRequestBuilder.set(
+                    CaptureRequest.CONTROL_AF_MODE,
+                    CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE); //KAD added July 2, 2018
+
             mPreviewRequestBuilder.addTarget(surface);
 
             // Here, we create a CameraCaptureSession for camera preview.
@@ -861,6 +876,10 @@ public class Camera2BasicFragment extends Fragment
             // This is how to tell the camera to trigger.
             mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,
                     CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START);
+            mPreviewRequestBuilder.set(
+                    CaptureRequest.CONTROL_AF_MODE,
+                    CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE); // KAD added for autofocus
+
             // Tell #mCaptureCallback to wait for the precapture sequence to be set.
             mState = STATE_WAITING_PRECAPTURE;
             mCaptureSession.capture(mPreviewRequestBuilder.build(), mCaptureCallback,
@@ -903,6 +922,7 @@ public class Camera2BasicFragment extends Fragment
                                                @NonNull TotalCaptureResult result) {
 
                     showToast("Saved: " + mFile);
+                    //mCameraImage.setImageBitmap(mBitmapImage); // KAD add July 3, 2018
 
                     Log.d(TAG, mFile.toString());
                     unlockFocus();

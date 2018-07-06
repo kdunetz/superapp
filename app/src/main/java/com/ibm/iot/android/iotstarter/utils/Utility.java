@@ -44,6 +44,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.JsonObject;
 import com.ibm.iot.android.iotstarter.IoTStarterApplication;
 import com.ibm.iot.android.iotstarter.R;
 
@@ -71,12 +72,15 @@ public class Utility extends Object {
             c.add(Calendar.DATE, parseInt(days));
             Date couponExpirationDate = c.getTime();
             if ((new Date()).before(couponExpirationDate)) {
-                Log.d("debugme", "In couponActive:" + sdf.format(c.getTime()));
+                Log.d("debugme123", "In couponActive TRUE:" + sdf.format(c.getTime()));
                 return true;
-            } else
+            } else {
+                Log.d("debugme123", "In couponActive FALSE:" + sdf.format(c.getTime()));
+
                 return false;
+            }
         } catch (Exception e) {
-            Log.e("debugme", "Date Parser failed", e);
+            Log.e("debugme123", "Date Parser failed", e);
             e.printStackTrace();
         }
         return false;
@@ -439,6 +443,14 @@ public class Utility extends Object {
         }
 
     }
+    public static String getJSONString(JSONObject json, String name, String defaultValue) {
+        try {
+            return json.getString(name);
+        } catch (Exception e) {
+            return defaultValue;
+        }
+
+    }
 
     public static String toSHA1(byte[] convertme) {
         try {
@@ -494,8 +506,8 @@ public class Utility extends Object {
                                     if (googleMap != null) {
                                         BitmapDescriptor newBitmap = null;
 
-                                        if (app.getCouponCompanies().contains(name)) {
-                                            newBitmap = BitmapDescriptorFactory.fromResource(R.mipmap.dollarsign_29x29);
+                                        if (Utility.companyNameMatch(app, name)) {
+                                                newBitmap = BitmapDescriptorFactory.fromResource(R.mipmap.dollarsign_29x29);
                                             Marker now = googleMap.addMarker(new MarkerOptions().icon(newBitmap).position(latLng).title(name));
                                         }
                                         else {
@@ -522,6 +534,112 @@ public class Utility extends Object {
             RequestQueueSingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
         }
     }
+    public static void saveUser(final Context context, final IoTStarterApplication app) {
+
+        String url1 = "";
+        try {
+            url1 = "https://new-node-red-demo-kad.mybluemix.net/save?object_name=object_one";
+        }
+        catch (Exception e) {
+            Log.e("debugme", "Couldn't find ID in App User Record...returning without doing anything", e);
+            return;
+        }
+        String url2 = "";
+        try {
+            url2 = "https://new-node-red-demo-kad.mybluemix.net/getobject?object_name=object_one&id=" + app.appUser.getString("_id");
+        }
+        catch (Exception e) {
+            Log.e("debugme", "Couldn't find ID in App User Record...returning without doing anything", e);
+            return;
+        }
+
+        Log.d("debugme", "Getting AppUser Request -  " + url1);
+        JsonObjectRequest jsonObjectRequest = null;
+try {
+    final JsonObjectRequest secondRequest = new JsonObjectRequest
+
+            (Request.Method.GET, url2, null, new Response.Listener<JSONObject>() {
+
+                @Override
+                public void onResponse(JSONObject response) {
+
+                    Log.d("debugme", "Refresh AppUser Response -" + response.toString());
+                    try {
+                        app.setAppUser(response);
+                    } catch (Exception e) {
+                        Log.e("debugme", "Refresh AppUser Record", e);
+                        e.printStackTrace();
+                    }
+                }
+            }, new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    // TODO: Handle error
+                    Log.d("debugme", "Refresh AppUser Record - " + error.getMessage());
+
+                }
+            });
+
+
+    jsonObjectRequest = new JsonObjectRequest
+            (Request.Method.POST, url1, new JSONObject(app.appUser.toString()), new Response.Listener<JSONObject>() {
+
+                @Override
+                public void onResponse(JSONObject response) {
+
+                    Log.d("debugme", "Refresh AppUser Response First One -" + response.toString());
+                    try {
+                        //app.appUser = response;
+
+                        RequestQueueSingleton.getInstance(context).addToRequestQueue(secondRequest);
+
+                    } catch (Exception e) {
+                        Log.e("debugme", "Refresh AppUser Record", e);
+                        e.printStackTrace();
+                    }
+                }
+            }, new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    // TODO: Handle error
+                    Log.d("debugme", "Refresh AppUser Record - " + error.getMessage());
+
+                }
+            });
+} catch (Exception e)
+{
+    Log.e("debugme", "problem saving", e);
+}
+
+        RequestQueueSingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+        // 2nd call
+
+    }
+    public static boolean companyNameMatch(final IoTStarterApplication app, String name) {
+        for (int i = 0; i < app.getCouponCompanies().size(); i++) {
+            if (name.toUpperCase().replaceAll("'", "").replaceAll("-", " ").indexOf(app.getCouponCompanies().elementAt(i).toString().toUpperCase()) >= 0) {
+                return true;
+            }
+            if (app.getCouponCompanies().elementAt(i).toString().toUpperCase().replaceAll("'", "").replaceAll("-", " ").indexOf(name.toUpperCase()) >= 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public static boolean companyNameMatch(String name1, String name2) {
+          name1 = name1.toUpperCase().replaceAll("'", "").replaceAll("-", " ");
+          name2 = name2.toUpperCase().replaceAll("'", "").replaceAll("-", " ");
+            if (name1.indexOf(name2) >= 0) {
+                return true;
+            }
+            if (name2.indexOf(name1) >= 0) {
+                return true;
+            }
+        return false;
+    }
+
     public static void getPeopleInArea(Context context, final IoTStarterApplication app, Location location)
     {
         final GoogleMap googleMap = app.getGoogleMap();
