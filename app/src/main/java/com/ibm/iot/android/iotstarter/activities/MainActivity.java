@@ -15,27 +15,17 @@
  *******************************************************************************/
 package com.ibm.iot.android.iotstarter.activities;
 
-import android.Manifest;
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
-import android.content.ContentResolver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.IntentFilter;
 import android.content.IntentSender;
-import android.content.pm.PackageManager;
-import android.content.res.Configuration;
-import android.database.Cursor;
-import android.location.Location;
 import android.location.LocationManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.Telephony;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import android.speech.RecognizerIntent;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -85,9 +75,6 @@ import com.ibm.mobilefirstplatform.clientsdk.android.push.api.MFPSimplePushNotif
 
 /* KAD May 15, for Android Text to Speech */
 import android.media.MediaPlayer;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.widget.Toast;
@@ -97,12 +84,7 @@ import org.json.JSONObject;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -127,6 +109,8 @@ public class MainActivity extends Activity implements ActionBar.TabListener, OnI
 
     private String BluemixMobileBackendApplication_ROUTE = "https://hybrid-backend-kad.mybluemix.net";
     private String BluemixMobileBackendApplication_App_GUID= "b7a0d118-e3fd-40c3-8f86-0af1d14553a4";
+    private static final int REQ_CODE_SPEECH_INPUT = 100;
+
 
     private static final String ACTION_FOR_GET_PEOPLE = "DATA_RESULT_FOR_GET_PEOPLE";
 
@@ -148,101 +132,6 @@ public class MainActivity extends Activity implements ActionBar.TabListener, OnI
     private IoTStarterApplication app = null;
 
 
-
-
-    /**
-     * Callback for handling when a new tab is selected. Replace fragment_container content
-     * with the new fragment. In the case of IoT tab, also replace fragment_containerDraw.
-     * @param tab The selected tab
-     * @param fragmentTransaction The transaction containing this tab selection
-     */
-    @Override
-    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-        Log.d(TAG, ".onTabSelected() entered");
-
-        if (tab.getText().equals(Constants.LOGIN_LABEL)) {
-            fragmentTransaction.replace(R.id.fragment_container, loginFragment);
-            try {
-                fragmentTransaction.remove(drawFragment);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else if (tab.getText().equals(Constants.IOT_LABEL)) {
-            fragmentTransaction.replace(R.id.fragment_container, iotFragment);
-            fragmentTransaction.replace(R.id.fragment_containerDraw, drawFragment);
-            try {
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else if (tab.getText().equals(Constants.LOG_LABEL)) {
-            fragmentTransaction.replace(R.id.fragment_container, logFragment);
-            try {
-                fragmentTransaction.remove(drawFragment);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            // If switching to log tab, reset its badge value to 0
-            updateBadge(tab, 0);
-        } else if (tab.getText().equals(Constants.MAP_LABEL)) {
-            //Intent intent = new Intent(this, MapsActivity.class);
-            //startActivity(intent);
-            fragmentTransaction.replace(R.id.fragment_container, mapFragment);
-
-            try {
-            } catch (Exception e) {
-
-                e.printStackTrace();
-            }
-        }
-
-    }
-
-    /**
-     * Keep track of tab backStack when leaving tabs.
-     * @param tab The tab being left
-     * @param fragmentTransaction The transaction containing this tab selection
-     */
-    @Override
-    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-        Log.d(TAG, ".onTabUnselected() entered");
-        int index = backStack.size()-1;
-        if (tab.getText().equals(Constants.LOGIN_LABEL)) {
-            if (!backStack.isEmpty() && Constants.LOGIN_LABEL.equals(backStack.get(index))) {
-                backStack.remove(index);
-            } else {
-                backStack.add(Constants.LOGIN_LABEL);
-            }
-        } else if (tab.getText().equals(Constants.IOT_LABEL)) {
-            if (!backStack.isEmpty() && Constants.IOT_LABEL.equals(backStack.get(index))) {
-                backStack.remove(index);
-            } else {
-                backStack.add(Constants.IOT_LABEL);
-            }
-            try {
-                fragmentTransaction.remove(drawFragment);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else if (tab.getText().equals(Constants.LOG_LABEL)) {
-            if (!backStack.isEmpty() && Constants.LOG_LABEL.equals(backStack.get(index))) {
-                backStack.remove(index);
-            } else {
-                backStack.add(Constants.LOG_LABEL);
-            }
-        }
-    }
-
-    /**
-     * Do nothing for now
-     * @param tab The tab being selected
-     * @param fragmentTransaction The transaction containing this tab selection
-     */
-    @Override
-    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-        Log.d(TAG, ".onTabReselected() entered");
-    }
-
     /**
      * Create the MainActivity. Initialize the action bar tabs and restore activity saved state.
      * @param savedInstanceState The saved activity state
@@ -251,16 +140,16 @@ public class MainActivity extends Activity implements ActionBar.TabListener, OnI
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         String email = "";
-try {
-    Bundle b = getIntent().getExtras();
-     email = b.getString("email");
-    Log.d("debugme", "email = " + email);
-} catch (Exception e)
-{
-    Log.e("debugme", "alkdjf", e);
-    e.printStackTrace();
-}
-            // Initialize all the fragments 1 time when creating the activity
+        try {
+            Bundle b = getIntent().getExtras();
+            email = b.getString("email");
+            Log.d("debugme", "email = " + email);
+        } catch (Exception e)
+        {
+            Log.e("debugme", "alkdjf", e);
+            e.printStackTrace();
+        }
+        // Initialize all the fragments 1 time when creating the activity
         loginFragment = new LoginFragment();
         iotFragment = new IoTFragment();
         logFragment = new LogFragment();
@@ -272,7 +161,6 @@ try {
         app = (IoTStarterApplication)getApplication();
         app.setCurrentUser(email);
         app.engine = new TextToSpeech(this, this);
-
 
         // Setup the action bar
         ActionBar actionBar = getActionBar();
@@ -306,7 +194,7 @@ try {
             getActionBar().setSelectedNavigationItem(tabIndex);
         }
 
-
+        //getActionBar().setSelectedNavigationItem(1);
 
         setContentView(R.layout.main);
 /*
@@ -414,7 +302,104 @@ try {
 
         app.playCouponNotices();
 
+
     }
+
+
+
+    /**
+     * Callback for handling when a new tab is selected. Replace fragment_container content
+     * with the new fragment. In the case of IoT tab, also replace fragment_containerDraw.
+     * @param tab The selected tab
+     * @param fragmentTransaction The transaction containing this tab selection
+     */
+    @Override
+    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+        Log.d(TAG, ".onTabSelected() entered");
+
+        if (tab.getText().equals(Constants.LOGIN_LABEL)) {
+            fragmentTransaction.replace(R.id.fragment_container, loginFragment);
+            try {
+                fragmentTransaction.remove(drawFragment);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else if (tab.getText().equals(Constants.IOT_LABEL)) {
+            fragmentTransaction.replace(R.id.fragment_container, iotFragment);
+            fragmentTransaction.replace(R.id.fragment_containerDraw, drawFragment);
+            try {
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else if (tab.getText().equals(Constants.LOG_LABEL)) {
+            fragmentTransaction.replace(R.id.fragment_container, logFragment);
+            try {
+                fragmentTransaction.remove(drawFragment);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // If switching to log tab, reset its badge value to 0
+            updateBadge(tab, 0);
+        } else if (tab.getText().equals(Constants.MAP_LABEL)) {
+            //Intent intent = new Intent(this, MapsActivity.class);
+            //startActivity(intent);
+            fragmentTransaction.replace(R.id.fragment_container, mapFragment);
+
+            try {
+            } catch (Exception e) {
+
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    /**
+     * Keep track of tab backStack when leaving tabs.
+     * @param tab The tab being left
+     * @param fragmentTransaction The transaction containing this tab selection
+     */
+    @Override
+    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+        Log.d(TAG, ".onTabUnselected() entered");
+        int index = backStack.size()-1;
+        if (tab.getText().equals(Constants.LOGIN_LABEL)) {
+            if (!backStack.isEmpty() && Constants.LOGIN_LABEL.equals(backStack.get(index))) {
+                backStack.remove(index);
+            } else {
+                backStack.add(Constants.LOGIN_LABEL);
+            }
+        } else if (tab.getText().equals(Constants.IOT_LABEL)) {
+            if (!backStack.isEmpty() && Constants.IOT_LABEL.equals(backStack.get(index))) {
+                backStack.remove(index);
+            } else {
+                backStack.add(Constants.IOT_LABEL);
+            }
+            try {
+                fragmentTransaction.remove(drawFragment);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else if (tab.getText().equals(Constants.LOG_LABEL)) {
+            if (!backStack.isEmpty() && Constants.LOG_LABEL.equals(backStack.get(index))) {
+                backStack.remove(index);
+            } else {
+                backStack.add(Constants.LOG_LABEL);
+            }
+        }
+    }
+
+    /**
+     * Do nothing for now
+     * @param tab The tab being selected
+     * @param fragmentTransaction The transaction containing this tab selection
+     */
+    @Override
+    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+        Log.d(TAG, ".onTabReselected() entered");
+    }
+
 
 
 
@@ -437,6 +422,7 @@ try {
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)   {
+        super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             // Check for the integer request code originally supplied to   startResolutionForResult().
             case REQUEST_LOCATION:
@@ -454,6 +440,14 @@ try {
                         //enableGpsSetting();
                         Log.d("BLAHBLAH", "IN RESULT_CANCELED");
                         break;
+
+                }
+                break;
+            case REQ_CODE_SPEECH_INPUT:
+                if (resultCode == RESULT_OK && null != data) {
+                    ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    String text = result.get(0);
+                    Log.d("debugme", "SPEECH RESULT = " + text);
                 }
                 break;
         }
@@ -712,5 +706,8 @@ try {
             }
         }
     };
+
+
+
 
 }

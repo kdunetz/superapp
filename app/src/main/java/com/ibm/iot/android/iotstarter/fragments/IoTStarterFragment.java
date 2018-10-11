@@ -39,6 +39,7 @@ import com.ibm.iot.android.iotstarter.activities.DynamicTableActivity;
 import com.ibm.iot.android.iotstarter.activities.SelectImageActivity;
 import com.ibm.iot.android.iotstarter.activities.SettingsActivity;
 import com.ibm.iot.android.iotstarter.activities.TableListActivity;
+import com.ibm.iot.android.iotstarter.utils.LocationUtils;
 
 
 /**
@@ -154,6 +155,14 @@ public class IoTStarterFragment extends Fragment {
                 app.getMessageLog().clear();
                 updateViewStrings();
                 return true;
+           case R.id.logout:
+               LocationUtils locUtils = LocationUtils.getInstance(app.getApplicationContext());
+               locUtils.disconnect();
+               app.toggleAccel();
+               getActivity().finishAndRemoveTask();
+               getActivity().finish();
+                System.exit(0);
+                return true;
             default:
                 if (item.getTitle().equals(getResources().getString(R.string.app_name))) {
                     getActivity().openOptionsMenu();
@@ -213,7 +222,9 @@ public class IoTStarterFragment extends Fragment {
             Bundle b = new Bundle();
             b.putString("object_name", "object_one");
             b.putString("form_type", "display"); // display, create, edit
-            b.putString("data_url", "https://new-node-red-demo-kad.mybluemix.net/getAll?object_name=object_one");
+            //b.putString("data_url", "https://new-node-red-demo-kad.mybluemix.net/getAll?object_name=object_one");
+            b.putString("data_url", "http://superapp-apis.appspot.com/superapp_users");
+
             dynamicTableIntent.putExtras(b);
             //dynamicFormIntent.setData(Uri.parse("https://new-node-red-demo-kad.mybluemix.net/getuser?name=bobby1"));
             startActivity(dynamicTableIntent,b);

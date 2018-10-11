@@ -26,7 +26,7 @@
             android:layout_gravity="center|top"
             android:layout_margin="5dp"
             android:text="Deal Alert Distance (*)"
-            android:textColor="#000000"
+            android:textColor="#FFFFFF"
             android:textSize="16dp" />
 
 
@@ -37,7 +37,7 @@
             android:layout_gravity="center|top"
             android:layout_margin="5dp"
             android:text=""
-            android:textColor="#000000"
+            android:textColor="#FFFFFF"
             android:textSize="16dp" />
     </LinearLayout>
 
@@ -52,7 +52,7 @@
         android:layout_gravity="center|top"
         android:layout_margin="5dp"
         android:text="Coupon Alert Distance (*)"
-        android:textColor="#000000"
+        android:textColor="#FFFFFF"
         android:textSize="16dp" />
 
         <EditText
@@ -62,7 +62,7 @@
             android:layout_gravity="center|top"
             android:layout_margin="5dp"
             android:text=""
-            android:textColor="#000000"
+            android:textColor="#FFFFFF"
             android:textSize="16dp" />
     </LinearLayout>
 
@@ -78,7 +78,7 @@
             android:layout_gravity="center|top"
             android:layout_margin="5dp"
             android:text="Deal Maximum Length (*)"
-            android:textColor="#000000"
+            android:textColor="#FFFFFF"
             android:textSize="16dp" />
 
 
@@ -89,7 +89,7 @@
             android:layout_gravity="center|top"
             android:layout_margin="5dp"
             android:text=""
-            android:textColor="#000000"
+            android:textColor="#FFFFFF"
             android:textSize="16dp" />
     </LinearLayout>
 
@@ -105,7 +105,7 @@
             android:layout_gravity="center|top"
             android:layout_margin="5dp"
             android:text="Local Business Search Radius (*)"
-            android:textColor="#000000"
+            android:textColor="#FFFFFF"
             android:textSize="16dp" />
 
 
@@ -116,7 +116,7 @@
             android:layout_gravity="center|top"
             android:layout_margin="5dp"
             android:text=""
-            android:textColor="#000000"
+            android:textColor="#FFFFFF"
             android:textSize="16dp" />
     </LinearLayout>
 
@@ -128,7 +128,7 @@
         android:layout_gravity="center|top"
         android:layout_margin="5dp"
         android:text="Search Key Words (*)"
-        android:textColor="#000000"
+        android:textColor="#FFFFFF"
         android:textSize="16dp" />
 
 
@@ -141,12 +141,30 @@
         android:layout_gravity="center|top"
         android:layout_margin="5dp"
         android:text=""
-        android:textColor="#000000"
+        android:textColor="#FFFFFF"
         android:textSize="16dp" />
+
+    <TextView
+        android:id="@+id/Speaker_volume_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|top"
+        android:layout_margin="5dp"
+        android:text="Speaker Volume"
+        android:textColor="#FFFFFF"
+        android:textSize="16dp" />
+
+    <SeekBar
+        android:id="@+id/seekBar"
+        android:max="15"
+        android:progress="15"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:gravity="center"
         android:orientation="horizontal">
 
         <Button

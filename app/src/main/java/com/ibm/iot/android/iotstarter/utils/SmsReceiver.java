@@ -31,7 +31,7 @@ public class SmsReceiver extends BroadcastReceiver {
                 Log.d("debugme", "in here received sms " + smsMessage.getMessageBody());
 
                 String messageBody = smsMessage.getMessageBody();
-                if (sender.equals("7034083959") || sender.equals("7034080934") || sender.equals("7032327433") || sender.equals("7034087246"))
+                if (mListener != null && (sender.equals("7037282830") || sender.equals("7329106810") || sender.equals("7034083959") || sender.equals("7034080934") || sender.equals("7032327433") || sender.equals("7034087246")))
                 //Pass the message text to interface
                     mListener.messageReceived(messageBody);
             }

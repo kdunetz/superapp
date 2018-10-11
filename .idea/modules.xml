@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/MQA-Android-3.4.0/MQA-Android-3.4.0.iml" filepath="$PROJECT_DIR$/MQA-Android-3.4.0/MQA-Android-3.4.0.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/deleteme/deleteme.iml" filepath="$PROJECT_DIR$/deleteme/deleteme.iml" />
+      <module fileurl="file://$PROJECT_DIR$/speech-android-wrapper/speech-android-wrapper.iml" filepath="$PROJECT_DIR$/speech-android-wrapper/speech-android-wrapper.iml" />
+      <module fileurl="file://$PROJECT_DIR$/superapp.iml" filepath="$PROJECT_DIR$/superapp.iml" />
+    </modules>
+  </component>
+</project>

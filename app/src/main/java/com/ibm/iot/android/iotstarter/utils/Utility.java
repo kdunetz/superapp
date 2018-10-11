@@ -1,6 +1,7 @@
 package com.ibm.iot.android.iotstarter.utils;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
@@ -47,6 +48,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.JsonObject;
 import com.ibm.iot.android.iotstarter.IoTStarterApplication;
 import com.ibm.iot.android.iotstarter.R;
+import com.ibm.iot.android.iotstarter.activities.CameraActivity;
 
 /**
  * Created by kevindunetz on 5/13/18.
@@ -89,13 +91,18 @@ public class Utility extends Object {
     public static String getCurrentDateTime() {
         String pattern = "yyyy-MM-dd HH:mm:ss";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-        Log.d("debugme", "GETTING DATE - " + (new Date()).toString());
+        String date = simpleDateFormat.format(new Date());
+        return date;
+    }
+    public static String getCurrentDate() {
+        String pattern = "yyyy-MM-dd";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
         String date = simpleDateFormat.format(new Date());
         return date;
     }
 
     public static String encodeTobase64(Bitmap image) {
-        Log.d("debugme", "in encodeToBase");
+        Log.d("debugme", "in encodeToBase64");
         try {
             Bitmap immagex = image;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -538,7 +545,8 @@ public class Utility extends Object {
 
         String url1 = "";
         try {
-            url1 = "https://new-node-red-demo-kad.mybluemix.net/save?object_name=object_one";
+            //url1 = "https://new-node-red-demo-kad.mybluemix.net/save?object_name=object_one";
+            url1 = "http://superapp-apis/superapp_users";
         }
         catch (Exception e) {
             Log.e("debugme", "Couldn't find ID in App User Record...returning without doing anything", e);
@@ -546,7 +554,9 @@ public class Utility extends Object {
         }
         String url2 = "";
         try {
-            url2 = "https://new-node-red-demo-kad.mybluemix.net/getobject?object_name=object_one&id=" + app.appUser.getString("_id");
+            //url2 = "https://new-node-red-demo-kad.mybluemix.net/getobject?object_name=object_one&id=" + app.appUser.getString("_id");
+            url2 = "http://superapp-apis.appspot.com/superapp_users/" + app.appUser.getString("_id");
+
         }
         catch (Exception e) {
             Log.e("debugme", "Couldn't find ID in App User Record...returning without doing anything", e);
@@ -644,7 +654,8 @@ try {
     {
         final GoogleMap googleMap = app.getGoogleMap();
 
-        String url = "https://new-node-red-demo-kad.mybluemix.net/peopleInArea";
+        //String url = "https://new-node-red-demo-kad.mybluemix.net/peopleInArea";
+        String url = "http://superapp-apis.appspot.com/peopleInArea";
 
             Log.d("debugme","Getting people in area - Request "+url);
 

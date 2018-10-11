@@ -73,6 +73,7 @@ import java.util.Vector;
 import java.util.Iterator;
 
 import android.speech.tts.TextToSpeech;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -88,7 +89,7 @@ public class LocationUtils extends Activity implements LocationListener {
     private static LocationUtils instance;
     private IoTStarterApplication app;
     private LocationManager locationManager;
-    private Location lastLocation;
+    private Location lastLocation = null;
     private double cumulativeDistance = 0;
     private Context context;
     private Criteria criteria;
@@ -101,7 +102,7 @@ public class LocationUtils extends Activity implements LocationListener {
     private static final String FRAGMENT_DIALOG = "dialog";
     private int locationChangedCounter = 0;
     private static final String ACTION_FOR_GET_PEOPLE = "DATA_RESULT_FOR_GET_PEOPLE";
-
+    private double oldSpeed = 0;
 
     private LocationUtils(Context context) {
         this.context = context;
@@ -183,7 +184,6 @@ public class LocationUtils extends Activity implements LocationListener {
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
             locationManager.requestLocationUpdates(locationProvider, Constants.LOCATION_MIN_TIME, Constants.LOCATION_MIN_DISTANCE, this);
-
             return;
         }
         locationManager.requestLocationUpdates(locationProvider, Constants.LOCATION_MIN_TIME, Constants.LOCATION_MIN_DISTANCE, this);
@@ -234,10 +234,40 @@ public class LocationUtils extends Activity implements LocationListener {
     public void onLocationChanged(Location location) {
         Log.d(TAG, ".onLocationChanged() entered");
         double distanceMoved = 0.0;
-        lastLocation = location;
+if (location == null) { Log.d("debugme", "location null"); return; }
 
-        distanceMoved = distanceBetween(locationToLatLng(location), locationToLatLng(lastLocation));
+        CLocation myLocation = new CLocation(location, false);
+        Log.d("SPEED", "SPEED = " + myLocation.getSpeed());
+        double speed = Math.round(myLocation.getSpeed());// * 100.0)/100.0;
+        app.speed = speed;
+        if (app.mapResourceView != null)
+        {
+            TextView tv = (TextView) app.mapResourceView.findViewById(R.id.speed);
+            tv.setText(speed + " mph");
+        }
+        int locationCounterInterval = 50;
+
+        if (speed > 40)
+        {
+            locationCounterInterval = 200;
+
+           // if (oldSpeed < 40)
+           //     app.engine.speak("You just got to 40 miles per hour", TextToSpeech.QUEUE_ADD, null, null);
+
+        }
+        else if (speed > 80)
+            locationCounterInterval = 400;
+        else
+        if (speed > 120)
+            locationCounterInterval = 800;
+
+        oldSpeed = speed;
+
+        if (lastLocation != null)
+            distanceMoved = distanceBetween(locationToLatLng(location), locationToLatLng(lastLocation));
+
         cumulativeDistance += distanceMoved;
+        lastLocation = location;
 
         //app.getMessageLog().add("Moved");
 
@@ -249,9 +279,10 @@ public class LocationUtils extends Activity implements LocationListener {
         locationChangedCounter++;  // I only want to do some things every 5 or so location changes
 Log.d("debugme", locationChangedCounter + "");
 
-        /* initialize my latest position on first try..then do every 50 times I move */
-        if (locationChangedCounter < 2 || locationChangedCounter % 50 == 0) {
-            String url = "https://new-node-red-demo-kad.mybluemix.net/save?object_name=object_one";
+        /* initialize my latest position on first try..then do every X times I move, as I go faster....I check less often (can't kill bandwidth with API calls) */
+        if (locationChangedCounter < 2 || locationChangedCounter % locationCounterInterval == 0) {
+            //String url = "https://new-node-red-demo-kad.mybluemix.net/save?object_name=object_one";
+            String url = "http://superapp-apis.appspot.com/superapp_users";
             try {
                 app.appUser.put("latitude", location.getLatitude() + "");
                 app.appUser.put("longitude", location.getLongitude() + "");
@@ -266,11 +297,11 @@ Log.d("debugme", locationChangedCounter + "");
             }
 
         }
-        if (googleMap != null && (locationChangedCounter < 3 || locationChangedCounter % 50 == 0)) {
+        if (googleMap != null && (locationChangedCounter < 3 || locationChangedCounter % locationCounterInterval == 0)) {
             Utility.getPeopleInArea(this, app, location);
         }
 
-        if (locationChangedCounter == 1 || locationChangedCounter % 50 == 0) {
+        if (locationChangedCounter == 1 || locationChangedCounter % locationCounterInterval == 0) {
 
             Utility.loadLocalBusinesses(this, app, location);
             Log.d("debugme", "Getting localBusinesses - " + app.localBusinesses);

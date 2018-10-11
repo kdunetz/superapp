@@ -15,12 +15,15 @@
  *******************************************************************************/
 package com.ibm.iot.android.iotstarter.fragments;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.*;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
+import android.telephony.SmsManager;
 import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,14 +31,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.ibm.iot.android.iotstarter.IoTStarterApplication;
 import com.ibm.iot.android.iotstarter.R;
 import com.ibm.iot.android.iotstarter.activities.MainActivity;
 import com.ibm.iot.android.iotstarter.utils.Constants;
+import com.ibm.iot.android.iotstarter.utils.LocationUtils;
 import com.ibm.iot.android.iotstarter.utils.MessageFactory;
 import com.ibm.iot.android.iotstarter.utils.MqttHandler;
 import com.ibm.iot.android.iotstarter.utils.TopicFactory;
+
+import java.util.ArrayList;
+import java.util.Locale;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * The IoT Fragment is the main fragment of the application that will be displayed while the device is connected
@@ -44,6 +56,8 @@ import com.ibm.iot.android.iotstarter.utils.TopicFactory;
  */
 public class IoTFragment extends IoTStarterFragment {
     private final static String TAG = IoTFragment.class.getName();
+    private static final int REQ_CODE_SPEECH_INPUT = 100;
+
 
 
 
@@ -113,12 +127,89 @@ public class IoTFragment extends IoTStarterFragment {
 
         // setup button listeners
         Button button = (Button) getActivity().findViewById(R.id.sendText);
-        button.setOnClickListener(new View.OnClickListener() {
+
+        ImageButton voiceResponse = (ImageButton) getActivity().findViewById((R.id.get_voice_command));
+
+        voiceResponse.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                handleSendText();
+                startVoiceInput();
             }
         });
+
+
+
+    }
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            // Check for the integer request code originally supplied to   startResolutionForResult().
+            case REQ_CODE_SPEECH_INPUT:
+                if (resultCode == RESULT_OK && null != data) {
+                    ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    Log.d("debugme", "SPEECH RESULT = " + result.get(0));
+                    String text = result.get(0);
+                    if (text.equalsIgnoreCase("Enter receipt"))
+                    {
+
+                    }
+                    Toast.makeText(context, text, Toast.LENGTH_LONG);
+
+                    if (true) {
+                        if (text.equalsIgnoreCase("help"))
+                        {
+                            app.engine.speak("You can say send text to PERSON and then the actual text message", TextToSpeech.QUEUE_ADD, null, null);
+
+                        }
+                        else
+                        if (text.toUpperCase().startsWith("SEND TEXT TO RICARDO") && text.length() > 20)
+                            sendSMS("7037282830", text.substring(21));
+                        else
+                        if (text.toUpperCase().startsWith("SEND TEXT TO KEVIN") && text.length() > 18)
+                            sendSMS("7034083959", text.substring(19));
+                        else
+                        if (text.toUpperCase().startsWith("SEND TEXT TO ROSA") && text.length() > 17)
+                            sendSMS("7034080934", text.substring(18));
+                        else
+                        if (text.toUpperCase().startsWith("SEND TEXT TO ANDREW") && text.length() > 19)
+                            sendSMS("7032327433", text.substring(20));
+                        else
+                        if (text.toUpperCase().startsWith("SEND TEXT TO RYAN") && text.length() > 17)
+                            sendSMS("7034087246", text.substring(18));
+                        else
+                            app.engine.speak("Unrecognized command", TextToSpeech.QUEUE_ADD, null, null);
+
+                    }
+
+                }
+                break;
+        }
+    }
+    public void sendSMS(String phoneNo, String msg) {
+        try {
+            SmsManager smsManager = SmsManager.getDefault();
+            smsManager.sendTextMessage(phoneNo, null, msg, null, null);
+            Toast.makeText(context, "Message Sent",
+                    Toast.LENGTH_LONG).show();
+        } catch (Exception ex) {
+            Toast.makeText(context,ex.getMessage().toString(),
+                    Toast.LENGTH_LONG).show();
+            ex.printStackTrace();
+        }
+    }
+
+
+    private void startVoiceInput() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Hello, How can I help you?");
+        try {
+            startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
+        }
+        catch (ActivityNotFoundException a) {
+
+        }
     }
 
     /**

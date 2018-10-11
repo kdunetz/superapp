@@ -79,7 +79,9 @@ public class FindNeighborsActivity extends Activity {
 
     protected ListView listView;
     protected ArrayAdapter<String> listAdapter;
-    private static final String TEST_URL                   = "https://new-node-red-demo-kad.mybluemix.net/getAll?object_name=object_one";
+    //private static final String TEST_URL                   = "https://new-node-red-demo-kad.mybluemix.net/getAll?object_name=object_one";
+    private static final String TEST_URL                   = "http://superapp-apis.appspot.com/superapp_users";
+
     private static final String ACTION_FOR_INTENT_CALLBACK = "THIS_IS_A_UNIQUE_KEY_WE_USE_TO_COMMUNICATE";
 
     ProgressDialog progress;

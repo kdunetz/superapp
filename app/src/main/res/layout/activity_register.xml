@@ -55,13 +55,29 @@
                 android:singleLine="true" />
 
             <Button
-                android:id="@+id/email_sign_in_button"
-                style="?android:textAppearanceSmall"
-                android:layout_width="match_parent"
+                style="@style/BottomButton"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="@string/action_sign_in"
-                android:textStyle="bold" />
+                android:paddingTop="@dimen/activity_vertical_margin"
+                android:layout_width="100dp"
+                android:layout_gravity="center"
+                android:id="@+id/email_sign_in_button"
+                android:text="Sign in"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="OR"
+                android:gravity="center"
+                android:textColor="#FFFFFF"
+                android:textSize="32dp" />
+                />
+            <Button
+                style="@style/BottomButton"
+                android:layout_width="100dp"
+                android:layout_gravity="center"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/activity_vertical_margin"
+                android:id="@+id/register_button"
+                android:text="Register"/>
 
         </LinearLayout>
     </ScrollView>

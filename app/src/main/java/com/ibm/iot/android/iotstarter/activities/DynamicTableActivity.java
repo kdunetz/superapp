@@ -254,7 +254,9 @@ Log.d("debugme", "start Dynamic Table Activity");
                                     b.putString("object_name", objectName);
                                     b.putString("form_type", "display"); // display, create, edit
                                     try {
-                                        b.putString("data_url", "https://new-node-red-demo-kad.mybluemix.net/getobject?object_name=" + _objectName + "&id=" + dataObj.getString("_id"));
+                                        //b.putString("data_url", "https://new-node-red-demo-kad.mybluemix.net/getobject?object_name=" + _objectName + "&id=" + dataObj.getString("_id"));
+                                        b.putString("data_url", "http://superapp-apis.appspot.com/superapp_users/id=" + dataObj.getString("_id"));
+
                                     } catch (Exception e)
                                     {
                                         Log.e("debugme", "Problem with JSON Object", e);
@@ -580,6 +582,8 @@ Log.d("debugme", "start Dynamic Table Activity");
             Log.d("debugme", "GOT DATA RESULT = " + _dataURL);
             Utility.callRESTAPI(this, _dataURL, "get", ACTION_FOR_DATA_RESULT, "");
         }
+
+        app = (IoTStarterApplication) getApplication().getApplicationContext();
 
         Utility.callRESTAPI(this, app.metaDataURL + "?object=" + _objectName, "get", ACTION_FOR_INTENT_CALLBACK, "");
 

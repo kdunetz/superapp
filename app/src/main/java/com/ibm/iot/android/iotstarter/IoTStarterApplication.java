@@ -88,6 +88,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+
+import android.view.View;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -155,14 +157,21 @@ public class IoTStarterApplication extends Application {
     Vector couponCompanies = new Vector();
 
     // Variables to be downloaded from central site or configured locally
-    public int sensorTiming = 5000; // how often the sensor data is sent to the Cloud...don't want to waste BW unnecessarily
-    public String metaDataURL = "https://new-node-red-demo-kad.mybluemix.net/getmetadata";
+    public int sensorTiming = 10000; // how often the sensor data is sent to the Cloud...don't want to waste BW unnecessarily
+//    public String metaDataURL = "https://new-node-red-demo-kad.mybluemix.net/getmetadata";
+//    public String getBusinessesURL = "http://new-node-red-demo-kad.mybluemix.net/businessesInArea";
+    public String metaDataURL = "http://superapp-apis.appspot.com/getmetadata";
+    public String getBusinessesURL = "http://superapp-apis.appspot.com/businessesInArea";
+
     public String apiString2 = ""; //unused
     public String apiString3 = ""; //unused
     public int dealDistance = 200; // notify user of the deal when you are within X meters
     public int maxDealLength = 30; // don't play this deal if the string is too long
     public int couponAlertDistanceMeters = 4000; //200; // notify user that they have a coupon when you are within X meters
     public int localBusinessSearchRadius = 4000; //500; // search for business locations which will accept your coupon within X meters
+    public int speakerVolume = 15;
+    public double speed = 0;
+    public View mapResourceView = null;
 
 
     /**
@@ -179,6 +188,7 @@ public class IoTStarterApplication extends Application {
         maxDealLength = Utility.parseInt(hash.get("max_deal_length").toString());
         couponAlertDistanceMeters = Utility.parseInt(hash.get("coupon_alert_distance").toString());
         localBusinessSearchRadius = Utility.parseInt(hash.get("local_business_search_radius").toString());
+        speakerVolume = Utility.parseInt(hash.get("speaker_volume").toString());
 
         new ConnectToCloudant().execute("");
 
@@ -205,13 +215,14 @@ public class IoTStarterApplication extends Application {
         //enablePush(true);
         /* KAD added May 30th to have tts.speak adjustable by sound buttons */
         AudioManager am = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
-        int amStreamMusicMaxVol = am.getStreamMaxVolume(am.STREAM_MUSIC);
-        am.setStreamVolume(am.STREAM_MUSIC, amStreamMusicMaxVol, 0);
 
-        String url = "http://new-node-red-demo-kad.mybluemix.net/businessesInArea";
+        //int amStreamMusicMaxVol = am.getStreamMaxVolume(am.STREAM_MUSIC);
+        //Log.d("debugme", "Speaker Volume Max = " + amStreamMusicMaxVol);
+        am.setStreamVolume(am.STREAM_MUSIC, speakerVolume, 0);
+
 
         JsonArrayRequest jsonObjectRequest = new JsonArrayRequest
-                (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+                (Request.Method.GET, getBusinessesURL, null, new Response.Listener<JSONArray>() {
 
                     @Override
                     public void onResponse(JSONArray response) {
@@ -224,7 +235,7 @@ public class IoTStarterApplication extends Application {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         // TODO: Handle error
-                        Log.d("debugme", error.getMessage());
+                        //Log.d("debugme", error.getMessage());
 
                     }
                 });
@@ -445,6 +456,7 @@ public class IoTStarterApplication extends Application {
             hash.put("deal_alert_distance", settings.getInt("deal_alert_distance", 200) + "");
             hash.put("max_deal_length", settings.getInt("max_deal_length", 30) + "");
             hash.put("local_business_search_radius", settings.getInt("local_business_search_radius", 400) + "");
+            hash.put("speaker_volume", settings.getInt("speaker_volume", 15) + "");
 
         } catch (Exception e)
         {
@@ -454,20 +466,27 @@ public class IoTStarterApplication extends Application {
         return hash;
     }
 
-    public boolean saveSettings(int coupon_alert_distance, int deal_alert_distance, int max_deal_length, int local_business_search_radius)
+    public boolean saveSettings(int coupon_alert_distance, int deal_alert_distance, int max_deal_length, int local_business_search_radius, int speaker_volume)
     {
         SharedPreferences.Editor editor = settings.edit();
-        if (coupon_alert_distance < 0 || deal_alert_distance < 0 || max_deal_length < 0 || local_business_search_radius < 0)
+        if (coupon_alert_distance < 0 || deal_alert_distance < 0 || max_deal_length < 0 || local_business_search_radius < 0 || speaker_volume < 0)
             return false;
 
         editor.putInt("coupon_alert_distance", coupon_alert_distance);
         editor.putInt("deal_alert_distance", deal_alert_distance);
         editor.putInt("max_deal_length", max_deal_length);
         editor.putInt("local_business_search_radius", local_business_search_radius);
+        editor.putInt("speaker_volume", speaker_volume);
+
         dealDistance = deal_alert_distance;
         maxDealLength = max_deal_length;
         couponAlertDistanceMeters = coupon_alert_distance;
         localBusinessSearchRadius = local_business_search_radius;
+        speakerVolume = speaker_volume;
+
+        AudioManager am = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        am.setStreamVolume(am.STREAM_MUSIC, speakerVolume, 0);
+
 
         editor.commit();
         return true;
@@ -712,6 +731,7 @@ public class IoTStarterApplication extends Application {
 
     public Bitmap getBitmapFromURL(String imageUrl) {
         try {
+
             URL url = new URL(imageUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setDoInput(true);

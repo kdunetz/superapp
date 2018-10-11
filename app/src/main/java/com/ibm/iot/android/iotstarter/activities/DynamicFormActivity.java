@@ -111,6 +111,7 @@ Log.d("debugme", "start Dynamic Form Activity");
             Log.d("debugme", "GOT DATA RESULT = " + _dataURL);
             Utility.callRESTAPI(this, _dataURL, "get", ACTION_FOR_DATA_RESULT, "");
         }
+        app = (IoTStarterApplication) getApplication().getApplicationContext();
 
         Utility.callRESTAPI(this, app.metaDataURL + "?object=" + _objectName, "get", ACTION_FOR_INTENT_CALLBACK, "");
 
@@ -137,7 +138,9 @@ Log.d("debugme", "start Dynamic Form Activity");
                 Bundle b = new Bundle();
                 b.putString("object_name", _objectName);
                 b.putString("form_type", "display"); // display, create, edit
-                b.putString("data_url", "https://new-node-red-demo-kad.mybluemix.net/getall?object_name=" + _objectName);
+                //b.putString("data_url", "https://new-node-red-demo-kad.mybluemix.net/getall?object_name=" + _objectName);
+                b.putString("data_url", "http://superapp-apis.appspot.com/" + _objectName);
+
                 dynamicTableIntent.putExtras(b);
                 startActivity(dynamicTableIntent,b);
                 unregisterReceiver(receiver);
@@ -221,7 +224,9 @@ Log.d("debugme", "start Dynamic Form Activity");
                                             Bundle b = new Bundle();
                                             b.putString("object_name", _objectName);
                                             b.putString("form_type", "display"); // display, create, edit
-                                            b.putString("data_url", "https://new-node-red-demo-kad.mybluemix.net/getAll?object_name=" + _objectName);
+                                            //b.putString("data_url", "https://new-node-red-demo-kad.mybluemix.net/getAll?object_name=" + _objectName);
+                                            b.putString("data_url", "http://superapp-apis.appspot.com/" + _objectName);
+
                                             dynamicTableIntent.putExtras(b);
                                             startActivity(dynamicTableIntent,b);
                                         } catch (Exception e) {
@@ -264,9 +269,10 @@ Log.d("debugme", "start Dynamic Form Activity");
                                     public void onClick(View v) {
                                         // TODO Auto-generated method stub
                                         try {
-                                            String url = "https://new-node-red-demo-kad.mybluemix.net/delete?object_name=" + _objectName;
+                                            //String url = "https://new-node-red-demo-kad.mybluemix.net/delete?object_name=" + _objectName;
+                                            String url = "http://superapp-apis.appspot.com/" + _objectName + "/" + _dataObject.get("_id");
 
-                                            Utility.callRESTAPI(v.getContext(), url, "post", ACTION_FOR_DELETE_RESULT, _dataObject.toString());
+                                            Utility.callRESTAPI(v.getContext(), url, "delete", ACTION_FOR_DELETE_RESULT, _dataObject.toString());
 
 
                                             Log.d(TAG, "KAD saved");
@@ -442,7 +448,9 @@ Log.d("debugme", "start Dynamic Form Activity");
         else
         {
             //String url = "https://ddc1728e-316e-4a3e-a75e-e85be80a4e99-bluemix:44ea0e6682c63ea1e73b24c2fe1bf5b1a37c4e2ad205bb612a54d1d2e81d40ad@ddc1728e-316e-4a3e-a75e-e85be80a4e99-bluemix.cloudant.com/user";
-            String url = "https://new-node-red-demo-kad.mybluemix.net/save?object_name=" + _objectName;
+            //String url = "https://new-node-red-demo-kad.mybluemix.net/save?object_name=" + _objectName;
+            String url = "http://superapp-apis.appspot.com/" + _objectName;
+
             Log.d("debugme", url);
 
             Utility.callRESTAPI(this, url, "post", ACTION_FOR_SAVE_RESULT, dataObject.toString());

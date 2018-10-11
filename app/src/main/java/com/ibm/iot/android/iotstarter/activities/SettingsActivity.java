@@ -10,11 +10,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.SeekBar;
 
 import com.ibm.iot.android.iotstarter.IoTStarterApplication;
 import com.ibm.iot.android.iotstarter.R;
@@ -25,9 +27,10 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends Activity {
     private final static String TAG = SettingsActivity.class.getName();
     protected IoTStarterApplication app;
+    int speakerVolume = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +46,8 @@ public class SettingsActivity extends AppCompatActivity {
             final EditText maxDealLength = (EditText) findViewById(R.id.max_deal_length);
             final EditText localBusinessSearchRadius = (EditText) findViewById(R.id.local_business_search_radius);
             final EditText searchKeywords = (EditText) findViewById(R.id.search_key_words);
+            final SeekBar speakerVolume = (SeekBar) findViewById(R.id.seekBar);
+            speakerVolume.setOnSeekBarChangeListener(seekBarChangeListener);
 
             if (app != null) {
                 HashMap hash = app.getSettings();
@@ -52,6 +57,7 @@ public class SettingsActivity extends AppCompatActivity {
                     dealAlertDistance.setText(hash.get("deal_alert_distance") + "");
                     maxDealLength.setText(hash.get("max_deal_length") + "");
                     localBusinessSearchRadius.setText(hash.get("local_business_search_radius") + "");
+                    speakerVolume.setProgress(Utility.parseInt(hash.get("speaker_volume") + ""));
                 }
             }
             searchKeywords.setText(app.appUser.getString("search_key_words"));
@@ -78,7 +84,9 @@ public class SettingsActivity extends AppCompatActivity {
                             Log.e("debugme","Problem saving User record to database", e);
                         }
                         */
-                        if (app.saveSettings(Utility.parseInt(couponAlertDistance.getText().toString()), Utility.parseInt(dealAlertDistance.getText().toString()), Utility.parseInt( maxDealLength.getText().toString()), Utility.parseInt(localBusinessSearchRadius.getText().toString()))) {
+                        if (app.saveSettings(Utility.parseInt(couponAlertDistance.getText().toString()), Utility.parseInt(dealAlertDistance.getText().toString()), Utility.parseInt( maxDealLength.getText().toString()), Utility.parseInt(localBusinessSearchRadius.getText().toString()), speakerVolume.getProgress())) {
+                            app.engine.speak("Testing Volume", TextToSpeech.QUEUE_ADD, null, null);
+
                             finish();
                             Log.d(TAG, "KAD saved");
                         }
@@ -116,6 +124,7 @@ public class SettingsActivity extends AppCompatActivity {
                         dealAlertDistance.setText("200");
                         maxDealLength.setText("30");
                         localBusinessSearchRadius.setText("400");
+                        speakerVolume.setProgress(7);
                     } catch (Exception e) {
                         e.printStackTrace();
                         Log.e(TAG, "KAD CRASH", e);
@@ -123,6 +132,7 @@ public class SettingsActivity extends AppCompatActivity {
                     //System.out.println("You have inserted the document");
                 }
             });
+
 
         } catch (Exception e) {
             Log.e("debugme", "Problem populating the EditView", e);
@@ -138,5 +148,23 @@ public class SettingsActivity extends AppCompatActivity {
 
 
     }
+    SeekBar.OnSeekBarChangeListener seekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
+
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            // updated continuously as the user slides the thumb
+            speakerVolume = progress;
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+            // called when the user first touches the SeekBar
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+            // called after the user finishes moving the SeekBar
+        }
+    };
 
 }

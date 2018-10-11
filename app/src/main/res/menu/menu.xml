@@ -20,6 +20,10 @@
           android:title="@string/profiles_label"
           android:orderInCategory="0"
           android:showAsAction="never"/>-->
+  <item android:id="@+id/logout"
+      android:title="@string/logout_label"
+      android:orderInCategory="0"
+      android:showAsAction="never"/>
     <item android:id="@+id/action_accel"
           android:title="@string/accel_label"
           android:orderInCategory="1"

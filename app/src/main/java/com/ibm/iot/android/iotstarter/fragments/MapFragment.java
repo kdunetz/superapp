@@ -55,6 +55,7 @@ public class MapFragment extends IoTStarterFragment implements OnMapReadyCallbac
 
         View v = inflater.inflate(R.layout.map, container, false);
         app = (IoTStarterApplication) getActivity().getApplication();
+        app.mapResourceView = v;
 
         // Gets the MapView from the XML layout and creates it
         mapView = (MapView) v.findViewById(R.id.mapview);

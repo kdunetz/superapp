@@ -337,8 +337,8 @@ public class LoginFragment extends IoTStarterFragment {
         ((TextView) getActivity().findViewById(R.id.isConnected)).setText(connectedString);
         activateButton.setText(getResources().getString(R.string.deactivate_button));
         if (app.isAccelEnabled()) {
-            //LocationUtils locUtils = LocationUtils.getInstance(context);
-            //locUtils.connect();
+            LocationUtils locUtils = LocationUtils.getInstance(context);
+            locUtils.connect(); // KAD delete me July 9, 2018
             app.setDeviceSensor(DeviceSensor.getInstance(context));
             app.getDeviceSensor().enableSensor();
         }

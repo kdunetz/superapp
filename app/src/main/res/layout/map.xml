@@ -11,10 +11,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/add_location" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:id="@+id/speed"
+        android:textSize="24dp"
+        android:textColor="@color/red"
+        android:layout_centerHorizontal="true"
+        android:text="0.0 mph"/>
     <Button
-    android:id="@+id/recenter"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="@string/recenter" android:layout_alignParentRight="true"
+        android:id="@+id/recenter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/recenter"
+        android:layout_alignParentRight="true"
         />
 </RelativeLayout>

@@ -30,9 +30,11 @@
     <Button style="@style/BottomButton"
             android:layout_gravity="center"
             android:text="Save"
+            android:layout_width="100dp"
             android:id="@+id/dynamicFormButton"/>
     <Button style="@style/BottomButton"
         android:layout_gravity="center"
+        android:layout_width="100dp"
         android:text="Delete"
         android:id="@+id/delete_button"/>
 

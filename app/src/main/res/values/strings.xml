@@ -32,6 +32,8 @@
 
     <!-- Menu Actions -->
     <string name="login_label">LOGIN</string>
+    <string name="logout_label">Logout</string>
+
     <string name="iot_label">Tab 2</string>
     <string name="log_label">LOG</string>
     <string name="accel_label">Toggle Accel</string>

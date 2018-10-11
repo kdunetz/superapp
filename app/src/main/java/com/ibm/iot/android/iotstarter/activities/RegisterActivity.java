@@ -116,6 +116,14 @@ public class RegisterActivity extends Activity implements LoaderCallbacks<Cursor
                 attemptLogin();
             }
         });
+        Button registerButton = (Button) findViewById(R.id.register_button);
+        registerButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent registerIntent = new Intent(view.getContext(), RegisterActivity2.class);
+                startActivity(registerIntent);
+            }
+        });
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
@@ -357,13 +365,15 @@ public class RegisterActivity extends Activity implements LoaderCallbacks<Cursor
 
                 String hashedPassword = Utility.toSHA1(mPassword.getBytes());
 
-                HttpGet httpGet = new HttpGet(new URI("https://new-node-red-demo-kad.mybluemix.net/authenticate?username=%22" + mEmail + "%22")); //&password=" + hashedPassword));
+                //HttpGet httpGet = new HttpGet(new URI("https://kad-node-red-starter.mybluemix.net/authenticate?username=%22" + mEmail + "%22")); //&password=" + hashedPassword));
+                HttpGet httpGet = new HttpGet(new URI("http://superapp-apis.appspot.com/authenticate?username=%22" + mEmail + "%22")); //&password=" + hashedPassword));
+
                 HttpResponse serverResponse = new DefaultHttpClient().execute(httpGet);
                 BasicResponseHandler handler = new BasicResponseHandler();
                 String result = handler.handleResponse(serverResponse);
                 Log.d("debugme", "RESULT =" + result);
                 app = (IoTStarterApplication)getApplication();
-                app.appUser = (new JSONArray(result)).getJSONObject(0);
+                //app.appUser = (new JSONArray(result)).getJSONObject(0);
                 Log.d("debugme", "hashedPassword = " + hashedPassword);
 
                 //Thread.sleep(10000);

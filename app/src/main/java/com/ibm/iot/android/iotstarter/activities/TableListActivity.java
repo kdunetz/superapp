@@ -131,6 +131,8 @@ Log.d("debugme", "start Dynamic Table List Activity");
 //            Utility.callRESTAPI(this, _dataURL, "get", ACTION_FOR_DATA_RESULT, "");
 //        }
 
+        app = (IoTStarterApplication) getApplication().getApplicationContext();
+
         Utility.callRESTAPI(this, app.metaDataURL + "?object=" + _objectName, "get", ACTION_FOR_INTENT_CALLBACK, "");
 /*
         DisplayMetrics dm = getResources().getDisplayMetrics();

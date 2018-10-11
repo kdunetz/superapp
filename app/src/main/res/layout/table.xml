@@ -9,6 +9,7 @@
         android:id="@+id/dynamicTableButton"/>
     <Button style="@style/BottomButton"
         android:layout_gravity="center"
+        android:layout_width="100dp"
         android:text="Create"
         android:id="@+id/create_button"/>
 
