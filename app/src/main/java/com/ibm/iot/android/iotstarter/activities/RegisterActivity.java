@@ -362,16 +362,19 @@ public class RegisterActivity extends Activity implements LoaderCallbacks<Cursor
             try {
                 // Simulate network access.
                 //Utility.callRESTAPI(getApplicationContext(), "https://new-node-red-demo-kad.mybluemix.net/authenticate?username=\"" + mEmail + "\"", "get", ACTION_FOR_GET_USER_RESULT, "");
-
+                Utility.callRESTAPI(getApplicationContext(), "http://superapp-apis.appspot.com/api/superapp_users", "get", ACTION_FOR_GET_USER_RESULT, "");
+if (true)
+                return true;
                 String hashedPassword = Utility.toSHA1(mPassword.getBytes());
 
                 //HttpGet httpGet = new HttpGet(new URI("https://kad-node-red-starter.mybluemix.net/authenticate?username=%22" + mEmail + "%22")); //&password=" + hashedPassword));
-                HttpGet httpGet = new HttpGet(new URI("http://superapp-apis.appspot.com/authenticate?username=%22" + mEmail + "%22")); //&password=" + hashedPassword));
+                HttpGet httpGet = new HttpGet(new URI("http://superapp-apis.appspot.com/api/superapp_users/%22" + mEmail + "%22")); //&password=" + hashedPassword));
 
                 HttpResponse serverResponse = new DefaultHttpClient().execute(httpGet);
                 BasicResponseHandler handler = new BasicResponseHandler();
                 String result = handler.handleResponse(serverResponse);
                 Log.d("debugme", "RESULT =" + result);
+
                 app = (IoTStarterApplication)getApplication();
                 //app.appUser = (new JSONArray(result)).getJSONObject(0);
                 Log.d("debugme", "hashedPassword = " + hashedPassword);

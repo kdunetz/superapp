@@ -31,6 +31,7 @@ import com.ibm.iot.android.iotstarter.activities.CameraActivity;
 import com.ibm.iot.android.iotstarter.activities.AndroidBarcodeQrActivity;
 
 import com.ibm.iot.android.iotstarter.activities.ConfirmOCRScan;
+import com.ibm.iot.android.iotstarter.activities.DriveCarActivity;
 import com.ibm.iot.android.iotstarter.activities.MainActivity;
 import com.ibm.iot.android.iotstarter.activities.ProfilesActivity;
 import com.ibm.iot.android.iotstarter.activities.FindNeighborsActivity;
@@ -51,6 +52,8 @@ public class IoTStarterFragment extends Fragment {
     protected IoTStarterApplication app;
     protected Menu menu;
     protected BroadcastReceiver broadcastReceiver;
+    private static final String ACTION_FOR_SAVE_RESULT = "SAVE_RESULT";
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -150,6 +153,9 @@ public class IoTStarterFragment extends Fragment {
             case R.id.create_coupon:
                 createCoupon();
                 return true;
+            case R.id.drive_car:
+                driveCar();
+                return true;
             case R.id.clear:
                 app.setUnreadCount(0);
                 app.getMessageLog().clear();
@@ -198,6 +204,21 @@ public class IoTStarterFragment extends Fragment {
             e.printStackTrace();
         }
     }
+    protected void driveCar() {
+        Log.d(TAG, ".driveCar() entered");
+        try {
+            Intent dynamicFormIntent = new Intent(getActivity().getApplicationContext(), DriveCarActivity.class);
+            Bundle b = new Bundle();
+            b.putString("json", "{}");
+            dynamicFormIntent.putExtras(b);
+            startActivity(dynamicFormIntent,b);
+        }
+        catch (Exception e)
+        {
+            Log.e(TAG, "BLAHBLAH", e);
+            e.printStackTrace();
+        }
+    }
     protected void dynamicForm() {
         Log.d(TAG, ".dynamicForm() entered");
         try {
@@ -223,7 +244,7 @@ public class IoTStarterFragment extends Fragment {
             b.putString("object_name", "object_one");
             b.putString("form_type", "display"); // display, create, edit
             //b.putString("data_url", "https://new-node-red-demo-kad.mybluemix.net/getAll?object_name=object_one");
-            b.putString("data_url", "http://superapp-apis.appspot.com/superapp_users");
+            b.putString("data_url", "http://superapp-apis.appspot.com/api/superapp_users");
 
             dynamicTableIntent.putExtras(b);
             //dynamicFormIntent.setData(Uri.parse("https://new-node-red-demo-kad.mybluemix.net/getuser?name=bobby1"));

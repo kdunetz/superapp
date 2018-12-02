@@ -68,5 +68,9 @@
       android:title="@string/create_coupon"
       android:orderInCategory="13"
       android:showAsAction="never"/>
+  <item android:id="@+id/drive_car"
+      android:title="@string/drive_car"
+      android:orderInCategory="14"
+      android:showAsAction="never"/>
 </menu>
 

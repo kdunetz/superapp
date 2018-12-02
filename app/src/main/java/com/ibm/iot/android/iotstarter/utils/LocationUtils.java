@@ -282,7 +282,7 @@ Log.d("debugme", locationChangedCounter + "");
         /* initialize my latest position on first try..then do every X times I move, as I go faster....I check less often (can't kill bandwidth with API calls) */
         if (locationChangedCounter < 2 || locationChangedCounter % locationCounterInterval == 0) {
             //String url = "https://new-node-red-demo-kad.mybluemix.net/save?object_name=object_one";
-            String url = "http://superapp-apis.appspot.com/superapp_users";
+            String url = "http://superapp-apis.appspot.com/api/superapp_users";
             try {
                 app.appUser.put("latitude", location.getLatitude() + "");
                 app.appUser.put("longitude", location.getLongitude() + "");
@@ -327,7 +327,7 @@ Log.d("debugme", locationChangedCounter + "");
                 Deal deal = (Deal) app.dealLocations.elementAt(x);
                 LatLng dealLocation5 = new LatLng(deal.getLatitude(), deal.getLongitude());
                 Double dist5 = distanceBetween(latLng, dealLocation5);
-                String message = "Found a deal KAD - " + x +
+                String message = "Searching for a deal KAD - " + x +
                         "," + dist5 + "," + deal.getDeal() + "," + longitude;
 
                 Log.d(TAG, message);

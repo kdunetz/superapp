@@ -255,7 +255,7 @@ Log.d("debugme", "start Dynamic Table Activity");
                                     b.putString("form_type", "display"); // display, create, edit
                                     try {
                                         //b.putString("data_url", "https://new-node-red-demo-kad.mybluemix.net/getobject?object_name=" + _objectName + "&id=" + dataObj.getString("_id"));
-                                        b.putString("data_url", "http://superapp-apis.appspot.com/superapp_users/id=" + dataObj.getString("_id"));
+                                        b.putString("data_url", "http://superapp-apis.appspot.com/api/superapp_users/id=" + dataObj.getString("_id"));
 
                                     } catch (Exception e)
                                     {
@@ -357,7 +357,8 @@ Log.d("debugme", "start Dynamic Table Activity");
                                             Bundle b = new Bundle();
                                             b.putString("object_name", _objectName);
                                             b.putString("form_type", "edit"); // display, create, edit
-                                            b.putString("data_url", "https://new-node-red-demo-kad.mybluemix.net/getuser?name=bobby1");
+                                           // b.putString("data_url", "https://new-node-red-demo-kad.mybluemix.net/getuser?name=bobby1");
+                                            b.putString("data_url", "http://superapp-apis.appspot.com/api/superapp_users");
                                             dynamicFormIntent.putExtras(b);
                                             //dynamicFormIntent.setData(Uri.parse("https://new-node-red-demo-kad.mybluemix.net/getuser?name=bobby1"));
                                             startActivity(dynamicFormIntent, b);

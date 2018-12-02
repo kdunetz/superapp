@@ -476,9 +476,9 @@ public class Utility extends Object {
 
         Vector companies = app.getCouponCompanies();
         //Vector companies = new Vector();
-        //companies.add("McDonald's");
-        //companies.add("Baskin-Robbins");
-        //companies.add("Chick Fillet");
+        companies.add("McDonald's");
+        companies.add("Baskin-Robbins");
+        companies.add("Chick Fillet");
         Log.d("debugme", "Getting localBusinesses receiptCompanyList = " + companies);
         for (int z = 0; z < companies.size(); z++) {
             String company = (String) companies.elementAt(z);
@@ -546,7 +546,7 @@ public class Utility extends Object {
         String url1 = "";
         try {
             //url1 = "https://new-node-red-demo-kad.mybluemix.net/save?object_name=object_one";
-            url1 = "http://superapp-apis/superapp_users";
+            url1 = "http://superapp-apis.appspot.com/api/superapp_users";
         }
         catch (Exception e) {
             Log.e("debugme", "Couldn't find ID in App User Record...returning without doing anything", e);
@@ -555,7 +555,7 @@ public class Utility extends Object {
         String url2 = "";
         try {
             //url2 = "https://new-node-red-demo-kad.mybluemix.net/getobject?object_name=object_one&id=" + app.appUser.getString("_id");
-            url2 = "http://superapp-apis.appspot.com/superapp_users/" + app.appUser.getString("_id");
+            url2 = "http://superapp-apis.appspot.com/api/superapp_users/" + app.appUser.getString("_id");
 
         }
         catch (Exception e) {
@@ -655,7 +655,7 @@ try {
         final GoogleMap googleMap = app.getGoogleMap();
 
         //String url = "https://new-node-red-demo-kad.mybluemix.net/peopleInArea";
-        String url = "http://superapp-apis.appspot.com/peopleInArea";
+        String url = "http://superapp-apis.appspot.com/api/superapp_users";
 
             Log.d("debugme","Getting people in area - Request "+url);
 
@@ -723,5 +723,55 @@ try {
             });
             RequestQueueSingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
 }
+
+    public static void getDeals(Context context, final IoTStarterApplication app)
+    {
+        String url = "http://superapp-apis.appspot.com/api/superapp_deals";
+
+        Log.d("debugme","Getting deals in area - Request "+url);
+
+        JsonArrayRequest jsonObjectRequest = new JsonArrayRequest
+                (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        //mTextView.setText("Response: " + response.toString());
+                        Log.d("debugme", "Getting deals in area - Response: " + response.toString());
+                        try {
+
+
+                            for (int x = 0; x < response.length(); x++) {
+                                Log.d("debugme", "showing deals");
+                                JSONObject jsonObject = response.getJSONObject(x);
+                                    Deal deal = new Deal(jsonObject);
+                                    String newCompanyToAdd = deal.getCompanyName();
+                                    if (newCompanyToAdd != null) {
+                                        newCompanyToAdd = newCompanyToAdd.replaceAll("'", "").replaceAll("-", " "); // Added for McDonalds...need to figure out better way
+                                        if (!app.couponCompanies.contains(newCompanyToAdd))
+                                            app.couponCompanies.add(newCompanyToAdd);
+                                    }
+                                    app.dealLocations.add(deal);
+
+                                    Log.d(TAG, "KAD cloudant " + deal.toString());
+
+                            }
+
+                        } catch (Exception e) {
+                            Log.e("debugme", "Problem getting deals in area", e);
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // TODO: Handle error
+                        Log.d("debugme", "Error getting deals in area response - " + error.getMessage());
+
+
+                    }
+                });
+        RequestQueueSingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+    }
 
 }

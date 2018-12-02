@@ -1,0 +1,73 @@
+{
+  "project_info": {
+    "project_number": "185946558862",
+    "firebase_url": "https://another-project-213615.firebaseio.com",
+    "project_id": "another-project-213615",
+    "storage_bucket": "another-project-213615.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:185946558862:android:09546560b4505797",
+        "android_client_info": {
+          "package_name": "com.google.firebase.samples.apps.mlkit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "185946558862-p2rq86oep6u5npl4i1hbcjnp6p7q8042.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-T1HtK5imDK6BlwWjFiIyu1g1ZELuaO4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:185946558862:android:ca771f8aa7268555",
+        "android_client_info": {
+          "package_name": "com.ibm.iot.android.iotstarter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "185946558862-p2rq86oep6u5npl4i1hbcjnp6p7q8042.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-T1HtK5imDK6BlwWjFiIyu1g1ZELuaO4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

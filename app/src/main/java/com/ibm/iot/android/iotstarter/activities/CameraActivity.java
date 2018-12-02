@@ -138,7 +138,7 @@ public class CameraActivity extends AppCompatActivity {
                     startActivity(confirmOCRIntent, b);
 finish();
                     if (false) {
-                        String url = "https://new-node-red-demo-kad.mybluemix.net/save?object_name=deal";
+                        String url = "http://superapp-apis.appspot.com/api/superapp_deals";
                         Log.d("debugme", url);
                         Log.d("debugme", json.toString());
                         //Utility.callRESTAPI(context, url, "post", ACTION_FOR_SAVE_CALLBACK, json.toString());

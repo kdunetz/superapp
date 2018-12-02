@@ -45,6 +45,8 @@ import java.net.URL;
 public class MapFragment extends IoTStarterFragment implements OnMapReadyCallback {
 
     private final static String TAG = IoTStarterApplication.class.getName();
+    private static final String ACTION_FOR_SAVE_RESULT = "SAVE_RESULT";
+
 
     MapView mapView;
     GoogleMap mMap;
@@ -115,6 +117,7 @@ public class MapFragment extends IoTStarterFragment implements OnMapReadyCallbac
                             deal.setLongitude(app.getCurrentLocation().getLongitude() + "");
                             deal.setLatitude(app.getCurrentLocation().getLatitude() + "");
                             deal.setDeal(editText.getText().toString().trim());
+
                             String username = "";
                             if (app.appUser != null)
                                 username = app.appUser.getString("username");
@@ -122,7 +125,11 @@ public class MapFragment extends IoTStarterFragment implements OnMapReadyCallbac
                             deal.setType("custom_deal");
                             app.dealLocations.add(deal);
                             //app.db2.save(deal);
-                            new ConnectToCloudant(deal, app).execute("");
+                            //new ConnectToCloudant(deal, app).execute("");
+                            String url = "http://superapp-apis.appspot.com/api/superapp_deals";
+                            Log.d(TAG, "deal to JSON = " + deal.toJSON());
+                            Utility.callRESTAPI(v.getContext(), url, "post", ACTION_FOR_SAVE_RESULT, deal.toJSON());
+                            //TODO..what if this service is not running ...need to handle error conditions
                             Log.d(TAG, "KAD saved");
                         } catch (Exception e) {
                             e.printStackTrace();

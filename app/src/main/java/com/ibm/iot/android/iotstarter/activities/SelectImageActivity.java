@@ -90,7 +90,7 @@ public class SelectImageActivity extends Activity {
                 "    {\n" +
                 "      \"image\": {\n" +
                 "        \"source\": {\n" +
-                "          \"gcsImageUri\": \"gs://awesome-lotus-201318.appspot.com/20180513_180558.jpg\"\n" +
+                "          \"gcsImageUri\": \"gs://awesome-lotus-201318.appspot.com/api/20180513_180558.jpg\"\n" +
                 "        }\n" +
                 "      },\n" +
                 "      \"features\": [\n" +
@@ -200,7 +200,7 @@ public class SelectImageActivity extends Activity {
                             "    {\n" +
                             "      \"image\": {\n" +
                             "        \"source\": {\n" +
-                            "          \"gcsImageUri\": \"gs://awesome-lotus-201318.appspot.com/20180513_180558.jpg\"\n" +
+                            "          \"gcsImageUri\": \"gs://awesome-lotus-201318.appspot.com/api/20180513_180558.jpg\"\n" +
                             "        }\n" +
                             "      },\n" +
                             "      \"features\": [\n" +

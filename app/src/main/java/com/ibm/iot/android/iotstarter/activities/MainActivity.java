@@ -18,10 +18,14 @@ package com.ibm.iot.android.iotstarter.activities;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentTransaction;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.content.IntentSender;
+import android.graphics.Color;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
@@ -63,15 +67,7 @@ import com.ibm.iot.android.iotstarter.utils.RestTask;
 import com.ibm.iot.android.iotstarter.utils.SmsListener;
 import com.ibm.iot.android.iotstarter.utils.SmsReceiver;
 import com.ibm.iot.android.iotstarter.utils.Utility;
-/*
-import com.ibm.mobilefirstplatform.clientsdk.android.core.api.BMSClient;
 
-import com.ibm.mobilefirstplatform.clientsdk.android.push.api.MFPPush;
-import com.ibm.mobilefirstplatform.clientsdk.android.push.api.MFPPushException;
-import com.ibm.mobilefirstplatform.clientsdk.android.push.api.MFPPushNotificationListener;
-import com.ibm.mobilefirstplatform.clientsdk.android.push.api.MFPPushResponseListener;
-import com.ibm.mobilefirstplatform.clientsdk.android.push.api.MFPSimplePushNotification;
-*/
 
 /* KAD May 15, for Android Text to Speech */
 import android.media.MediaPlayer;
@@ -107,8 +103,6 @@ public class MainActivity extends Activity implements ActionBar.TabListener, OnI
     private IoTFragment iotFragment;
     private MapFragment mapFragment;
 
-    private String BluemixMobileBackendApplication_ROUTE = "https://hybrid-backend-kad.mybluemix.net";
-    private String BluemixMobileBackendApplication_App_GUID= "b7a0d118-e3fd-40c3-8f86-0af1d14553a4";
     private static final int REQ_CODE_SPEECH_INPUT = 100;
 
 
@@ -116,7 +110,6 @@ public class MainActivity extends Activity implements ActionBar.TabListener, OnI
 
     private ArrayList<String> backStack;
 
-    //private MFPPush push = null;
     /* KAD added for Speech May 15, 2016 */
     private String text;
     private String song;
@@ -197,52 +190,6 @@ public class MainActivity extends Activity implements ActionBar.TabListener, OnI
         //getActionBar().setSelectedNavigationItem(1);
 
         setContentView(R.layout.main);
-/*
-        try {
-            //Initialize the Core SDK
-            BMSClient.getInstance().initialize(getApplicationContext(), BluemixMobileBackendApplication_ROUTE, BluemixMobileBackendApplication_App_GUID);
-            System.out.println("Starting up MFP");
-        } catch (MalformedURLException e) {
-            System.out.println("ERROR : Initialize the Core SDK");
-            e.printStackTrace();
-        }
-
-
-
-
-        * Use Service "hybrid-backend-kad-imfpush" to Do Push to the device *å
-
-        //Initialize client Push SDK for Java
-        MFPPush.getInstance().initialize(getApplicationContext());
-        push = MFPPush.getInstance();
-
-        MFPPush.getInstance().listen(new MFPPushNotificationListener() {
-            @Override
-            public void onReceive(MFPSimplePushNotification mfpSimplePushNotification) {
-                // Handle push notification here
-                new AlertDialog.Builder(getApplicationContext())
-                        .setTitle("Push notification received")
-                        .setMessage(mfpSimplePushNotification.getAlert())
-                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                            }
-                        })
-                        .show();
-            }
-        });
-        push.register(new MFPPushResponseListener<String>() {
-            @Override
-            public void onSuccess(String deviceId) {
-                System.out.println("KEVIN Registration successful - " + deviceId);
-            }
-
-            @Override
-            public void onFailure(MFPPushException ex) {
-                System.out.println("IN HERE KEVIN");
-                ex.printStackTrace();
-            }
-        });
-*/
 //        Intent intent = new Intent(this, LocationServicesKAD.class);
 //        startActivity(intent);
 
@@ -301,6 +248,44 @@ public class MainActivity extends Activity implements ActionBar.TabListener, OnI
         });
 
         app.playCouponNotices();
+
+        Log.d(TAG, "KEVIN BEFORE NOTIFICATION");
+        try {
+            String NOTIFICATION_CHANNEL_ID = "1";
+            CharSequence NOTIFICATION_CHANNEL_NAME = "kevin";
+            //NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(R.drawable.ic_icon);
+
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+            //    if(android.os.Build.VERSION.SDK_INT >=android.os.Build.VERSION_CODES.O)
+
+            {
+                int importance = NotificationManager.IMPORTANCE_LOW;
+                NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, NOTIFICATION_CHANNEL_NAME, importance);
+                notificationChannel.enableLights(true);
+                notificationChannel.setLightColor(Color.RED);
+                notificationChannel.enableVibration(true);
+                notificationChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+                notificationManager.createNotificationChannel(notificationChannel);
+
+            }
+            Log.d(TAG, "KEVIN BEFORE NOTIFICATION");
+
+            Notification notification = new Notification.Builder(this, NOTIFICATION_CHANNEL_ID)
+                    .setContentTitle("New Message Kevin")
+                    .setContentText("You've received new messages.")
+                    .setSmallIcon(R.drawable.ic_icon)
+                    .setChannelId(NOTIFICATION_CHANNEL_ID)
+                    .build();
+
+            notificationManager.notify(1, notification);
+        } catch (Exception e)
+        {
+
+            Log.e(TAG, "Stacktrace", e);
+        }
+
+        //notificationManager.notify((int)(System.currentTimeMillis()/1000),mBuilder.build());
 
 
     }

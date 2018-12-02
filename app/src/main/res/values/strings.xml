@@ -139,6 +139,8 @@
     <string name="scan_receipt">Scan Receipt</string>
     <string name="settings">Settings</string>
     <string name="create_coupon">Create Coupon</string>
+    <string name="drive_car">Drive Car</string>
+
 
     <string name="sttTitle">IBM Speech to Text</string>
     <string name="sttInstructions">To get started choose an audio model based on the language you will be speaking. Then press Record to transcribe audio.</string>
@@ -206,4 +208,5 @@
         completions."
     </string>
     <string name="title_activity_confirm_ocrscan">ConfirmOCRScan</string>
+    <string name="default_notification_channel_id">1</string>
 </resources>

@@ -171,6 +171,10 @@ public class DeviceSensor implements SensorEventListener {
             MqttHandler mqttHandler = MqttHandler.getInstance(context);
             mqttHandler.publish(topic, messageData, false, 0);
 
+            //PubSubHandler pubsubHandler = PubSubHandler.getInstance(context);
+            //pubsubHandler.publish(topic, messageData, false, 0);
+            //app.mPubsubPublisher.sendMessage(Constants.DRIVE_FORWARD, 11);
+
             app.setAccelData(G);
 
             String runningActivity = app.getCurrentRunningActivity();

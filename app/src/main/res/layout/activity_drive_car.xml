@@ -1,0 +1,142 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/settings_layout"
+    android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
+    style="@style/ActivityBackground"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
+    android:background="@drawable/ic_background"
+    tools:context="com.ibm.iot.android.iotstarter.activities.DriveCarActivity">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|top"
+            android:layout_margin="5dp"
+            android:text="Distance/Angle/Speed"
+            android:textColor="#FFFFFF"
+            android:textSize="16dp" />
+
+
+        <EditText
+            android:id="@+id/first_name"
+            android:layout_width="88dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|top"
+            android:layout_margin="5dp"
+            android:text=""
+            android:textColor="#FFFFFF"
+            android:textSize="16dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="500dp"
+        android:gravity="center"
+        android:orientation="vertical">
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/get_voice_command"
+            android:src="@drawable/ic_microphone_2" />
+
+        <Button
+            style="@style/BottomButton"
+            android:textColor="#FFFFFF"
+            android:id="@+id/drive_backward"
+            android:layout_width="120dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            android:gravity="center"
+            android:text="Drive Backward"
+
+            android:textSize="12dp"></Button>
+        <Button
+            style="@style/BottomButton"
+            android:textColor="#FFFFFF"
+            android:id="@+id/drive_forward"
+            android:layout_width="120dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            android:gravity="center"
+            android:text="Drive Forward"
+
+            android:textSize="12dp"></Button>
+        <Button
+            style="@style/BottomButton"
+            android:textColor="#FFFFFF"
+            android:id="@+id/gripper_open"
+            android:layout_width="120dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            android:gravity="center"
+            android:text="Open Gripper"
+
+            android:textSize="12dp"></Button>
+        <Button
+            style="@style/BottomButton"
+            android:textColor="#FFFFFF"
+            android:id="@+id/gripper_close"
+            android:layout_width="120dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            android:gravity="center"
+            android:text="Close Gripper"
+
+            android:textSize="12dp"></Button>
+        <Button
+            style="@style/BottomButton"
+            android:textColor="#FFFFFF"
+            android:id="@+id/turn_right"
+            android:layout_width="120dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            android:gravity="center"
+            android:text="Turn Right"
+
+            android:textSize="12dp"></Button>
+        <Button
+            style="@style/BottomButton"
+            android:textColor="#FFFFFF"
+            android:id="@+id/turn_left"
+            android:layout_width="120dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            android:gravity="center"
+            android:text="Turn Left"
+
+            android:textSize="12dp"></Button>
+        <Button
+            style="@style/BottomButton"
+            android:textColor="#FFFFFF"
+            android:id="@+id/speed"
+            android:layout_width="120dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            android:gravity="center"
+            android:text="Speed"
+
+            android:textSize="12dp"></Button>
+
+    </LinearLayout>
+</LinearLayout>

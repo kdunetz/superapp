@@ -95,4 +95,13 @@ public class Constants {
     // Location Services
     public final static int LOCATION_MIN_TIME = 1000; // KAD 30000
     public final static float LOCATION_MIN_DISTANCE = 1; // KAD 5
+
+    public final static int DRIVE_FORWARD = 1;
+    public final static int DRIVE_BACKWARD = 2;
+    public final static int GRIPPER_OPEN = 3;
+    public final static int GRIPPER_CLOSE = 4;
+    public final static int SPEED = 5;
+    public final static int TURN_RIGHT = 6;
+    public final static int TURN_LEFT = 7;
+
 }

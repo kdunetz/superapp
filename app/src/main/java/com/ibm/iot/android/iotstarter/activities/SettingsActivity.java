@@ -60,7 +60,7 @@ public class SettingsActivity extends Activity {
                     speakerVolume.setProgress(Utility.parseInt(hash.get("speaker_volume") + ""));
                 }
             }
-            searchKeywords.setText(app.appUser.getString("search_key_words"));
+            //searchKeywords.setText(app.appUser.getString("search_key_words"));
 
             Button button = (Button) findViewById(R.id.save_settings);
             button.setOnClickListener(new Button.OnClickListener() {
@@ -69,9 +69,12 @@ public class SettingsActivity extends Activity {
                 public void onClick(View v) {
                     // TODO Auto-generated method stub
                     try {
-                        app.appUser.put("search_key_words", searchKeywords.getText().toString());
+                        if(false) //TODO FIX THIS KEVIN Nov 20, 2018
+                        {
+                            app.appUser.put("search_key_words", searchKeywords.getText().toString());
                         // SAVE THING TO DATABASE
                         Utility.saveUser(v.getContext(), app);
+                    }
 /*
                         String url = "https://new-node-red-demo-kad.mybluemix.net/save?object_name=object_one";
                         try {

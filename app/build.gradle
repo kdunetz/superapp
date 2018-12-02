@@ -2,12 +2,12 @@ apply plugin: 'com.android.application'
 
 android {
 
-    compileSdkVersion 24
+    compileSdkVersion 26
     buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "com.ibm.iot.android.iotstarter"
-        minSdkVersion 24
-        targetSdkVersion 24
+        minSdkVersion 26
+        targetSdkVersion 26
     }
     buildTypes {
         release {
@@ -20,6 +20,9 @@ android {
     packagingOptions { // KAD added to remove Duplicate File message May 22 2016
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/INDEX.LIST'
+
     }
     useLibrary 'org.apache.http.legacy' // KAD added to support REST APIS Apr 30 2018
 
@@ -32,23 +35,47 @@ dependencies {
     // 10.0.1
     //compile 'com.android.support:appcompat-v7:21.0.3'
     //compile 'com.android.support:appcompat-v7:23.0.0'
-    compile project(':MQA-Android-3.4.0')
-    //compile 'com.ibm.mobilefirstplatform.clientsdk.android:push:1.+'
-    compile 'com.ibm.mobilefirstplatform.clientsdk.android:core:1.0.+@aar'
-    compile 'com.ibm.mobilefirstplatform.clientsdk.android:push:1.0.+@aar'
+    //compile project(':MQA-Android-3.4.0') //KAD took out Nov 19, 2018 because MQA not something I can keep in after leaving IBM
     compile 'com.cloudant:cloudant-client:2.4.3'
     //compile fileTree(dir: 'libs', include: ['*.jar'])
     //compile (name:'speech-android-wrapper',ext:'aar')
-    compile 'com.android.support:appcompat-v7:24.0.0'
+    compile 'com.android.support:appcompat-v7:26.1.0'
     //compile 'com.android.support:design:24.2.1'
     compile 'com.google.maps.android:android-maps-utils:0.4'
-    compile 'com.google.android.gms:play-services:11.0.1'
-    compile 'com.google.android.gms:play-services-location:11.0.1'
-    compile 'com.android.support:support-v4:24.2.1'
+    //compile 'com.google.android.gms:play-services:16.0.1'
+    compile 'com.google.android.gms:play-services-location:16.0.0'
+    //compile 'com.google.android.gms:play-services-measurement-base:16.0.4'
+    compile 'com.google.android.gms:play-services-places:16.0.0' // KAD added for Firebase Messaging
+
+    compile 'com.android.support:support-v4:26.1.0'
     compile 'com.android.volley:volley:1.0.0'
+    //compile 'com.google.cloud:google-cloud-pubsub:1.51.0'
+    //implementation 'com.github.kittinunf.fuel:fuel-android:1.12.1'
+    //implementation 'com.github.bassaer:chatmessageview:1.10.0'
+
+    implementation('com.google.api-client:google-api-client-android:1.22.0') {
+        exclude group: 'org.apache.httpcomponents'
+
+    }
+    implementation('com.google.apis:google-api-services-pubsub:v1-rev12-1.22.0') {
+        exclude group: 'org.apache.httpcomponents'
+    }
+
+    annotationProcessor 'com.google.auto.value:auto-value:1.5.2'
+
+    implementation 'com.google.firebase:firebase-core:16.0.5'
+    implementation 'com.google.firebase:firebase-iid:17.0.4'
+    implementation 'com.google.firebase:firebase-messaging:17.3.4'
+    implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
+
 }
 repositories {
     flatDir {
         dirs 'libs'
     }
 }
+
+apply plugin: 'com.google.gms.google-services'
+//com.google.gms.googleservices.GoogleServicesPlugin.config.disableVersionCheck = true
+
+

@@ -1,4 +1,8 @@
 package com.ibm.iot.android.iotstarter.utils;
+import org.json.JSONException;
+import org.json.JSONObject;
+import java.util.Iterator;
+
 import java.util.Date;
 // A Java type that can be serialized to JSON
 public class Deal {
@@ -22,6 +26,44 @@ public class Deal {
     private String username = "";
     private String company_name = "";
 
+    public Deal(JSONObject jsonObject) {
+        Iterator<String> iterator = jsonObject.keys();
+
+
+        for (; iterator.hasNext();) {
+            String key = iterator.next();
+            Object value;
+            try {
+                value = jsonObject.get(key);
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+            if (key.equals("deal")) {
+                this.deal = (String) value;
+            }
+            if (key.equals("latitude")) {
+                this.latitude = (String) value;
+            }
+            if (key.equals("longitude")) {
+                this.longitude = (String) value;
+            }
+            if (key.equals("company_name")) {
+                this.company_name = (String) value;
+            }
+            if (key.equals("creation_date")) {
+                this.creation_date = (String) value;
+            }
+            if (key.equals("username")) {
+                this.username = (String) value;
+            }
+            if (key.equals("num_days")) {
+                this.num_days = (String) value;
+            }
+            if (key.equals("coupon_expiration_days")) {
+                this.coupon_expiration_days = (String) value;
+           }
+        }
+    }
     public Deal(boolean isExample) {
         this.isExample = isExample; // KAD have no idea why this is here ...please remove
         lastSpoke = false;
@@ -139,6 +181,9 @@ public class Deal {
     }
 
     public String toString() {
-        return "{ id: " + _id + ",\nrev: " + _rev + ",\nlast_spoke: " + lastSpoke + "\ndeal: " + deal + "\n" + latitude + "\n" + longitude + "\n" + num_days + "\n" + coupon_expiration_days + "}";
+        return "{ id: " + _id + ",\nrev: " + _rev + ",\nlast_spoke: " + lastSpoke + "\n, \"deal\": " + deal + "\n" + latitude + "\n" + longitude + "\n" + num_days + "\n" + coupon_expiration_days + "}";
+    }
+    public String toJSON() {
+        return "{ \"last_spoke\": " + lastSpoke + "\n,\"deal\": \"" + deal + "\",\n\"latitude\": \"" + latitude + "\",\n\"longitude\":\"" + longitude + "\",\n\"num_days\":\"" + num_days + "\",\"creation_date\":\"" + creation_date + "\"\n}";
     }
 }

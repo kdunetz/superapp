@@ -38,17 +38,9 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" /> <!-- KAD for MQA -->
 
 
-    <!-- IBM Push -->
-
-
-    <!-- <permission android:name="com.ibm.iot.android.iotstarter.permission.C2D_MESSAGE" android:protectionLevel="signature" /> -->
-
 
 
     <uses-permission android:name="android.permission.GET_TASKS" />
-    <uses-permission android:name="com.ibm.iot.android.iotstarter.permission.C2D_MESSAGE" />
-    <uses-permission android:name="com.ibm.mobilefirstplatform.clientsdk.android.app.permission.C2D_MESSAGE" />
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
@@ -59,10 +51,6 @@
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
-
-    <permission
-        android:name="com.ibm.mobilefirstplatform.clientsdk.android.app.permission.C2D_MESSAGE"
-        android:protectionLevel="signature" />
 
     <application
         android:name=".IoTStarterApplication"
@@ -95,11 +83,6 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-            <intent-filter>
-                <action android:name="com.ibm.mobilefirstplatform.clientsdk.android.app.IBMPushNotification" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".activities.ProfilesActivity"
@@ -129,6 +112,9 @@
             android:name=".activities.RegisterActivity2"
             android:launchMode="singleTask" />
         <activity
+            android:name=".activities.DriveCarActivity"
+            android:launchMode="singleTask" />
+        <activity
             android:name=".activities.CameraActivity"
             android:launchMode="singleTask"
             android:theme="@style/MaterialTheme" />
@@ -148,6 +134,14 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
+<!--
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/default_notification_channel_id"/> -->
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="kevin"/>
 
         <activity
             android:name=".activities.MapsActivity"
@@ -156,30 +150,23 @@
             android:name=".activities.LocationServicesActivity"
             android:label="@string/title_activity_location_services"
             android:theme="@style/Theme.AppCompat.Light" />
+        <!-- for MQA not used anymore
         <activity android:name="com.ibm.mqa.ui.ProblemActivity" />
         <activity android:name="com.ibm.mqa.ui.FeedbackActivity" />
         <activity android:name="com.ibm.mqa.ui.ScreenshotEditorActivity" />
-        <!-- Push Settings Start -->
+        -->
 
-
-        <!-- Add GCM Intent Service and intent-filters for RECEIVE and REGISTRATION of notifications -->
-        <service android:name="com.ibm.mobilefirstplatform.clientsdk.android.push.api.MFPPushIntentService" />
-
-        <receiver
-            android:name="com.ibm.mobilefirstplatform.clientsdk.android.push.internal.MFPPushBroadcastReceiver"
-            android:permission="com.google.android.c2dm.permission.SEND">
-            <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-
-                <category android:name="com.ibm.mobilefirstplatform.clientsdk.android.app" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-
-                <category android:name="com.ibm.mobilefirstplatform.clientsdk.android.app" />
-            </intent-filter>
-        </receiver>
         <!-- Push Settings End -->
+        <service android:name=".activities.MyFirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+        <service android:name=".activities.FirebaseIDService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
 
         <activity
             android:name=".activities.ConfirmOCRScan" />

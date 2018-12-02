@@ -139,7 +139,7 @@ Log.d("debugme", "start Dynamic Form Activity");
                 b.putString("object_name", _objectName);
                 b.putString("form_type", "display"); // display, create, edit
                 //b.putString("data_url", "https://new-node-red-demo-kad.mybluemix.net/getall?object_name=" + _objectName);
-                b.putString("data_url", "http://superapp-apis.appspot.com/" + _objectName);
+                b.putString("data_url", "http://superapp-apis.appspot.com/api/superapp_" + _objectName + "s");
 
                 dynamicTableIntent.putExtras(b);
                 startActivity(dynamicTableIntent,b);
@@ -225,7 +225,7 @@ Log.d("debugme", "start Dynamic Form Activity");
                                             b.putString("object_name", _objectName);
                                             b.putString("form_type", "display"); // display, create, edit
                                             //b.putString("data_url", "https://new-node-red-demo-kad.mybluemix.net/getAll?object_name=" + _objectName);
-                                            b.putString("data_url", "http://superapp-apis.appspot.com/" + _objectName);
+                                            b.putString("data_url", "http://superapp-apis.appspot.com/api/superapp_" + _objectName + "s");
 
                                             dynamicTableIntent.putExtras(b);
                                             startActivity(dynamicTableIntent,b);
@@ -270,7 +270,7 @@ Log.d("debugme", "start Dynamic Form Activity");
                                         // TODO Auto-generated method stub
                                         try {
                                             //String url = "https://new-node-red-demo-kad.mybluemix.net/delete?object_name=" + _objectName;
-                                            String url = "http://superapp-apis.appspot.com/" + _objectName + "/" + _dataObject.get("_id");
+                                            String url = "http://superapp-apis.appspot.com/api/superapp_" + _objectName + "s/" + _dataObject.get("_id");
 
                                             Utility.callRESTAPI(v.getContext(), url, "delete", ACTION_FOR_DELETE_RESULT, _dataObject.toString());
 
@@ -449,7 +449,7 @@ Log.d("debugme", "start Dynamic Form Activity");
         {
             //String url = "https://ddc1728e-316e-4a3e-a75e-e85be80a4e99-bluemix:44ea0e6682c63ea1e73b24c2fe1bf5b1a37c4e2ad205bb612a54d1d2e81d40ad@ddc1728e-316e-4a3e-a75e-e85be80a4e99-bluemix.cloudant.com/user";
             //String url = "https://new-node-red-demo-kad.mybluemix.net/save?object_name=" + _objectName;
-            String url = "http://superapp-apis.appspot.com/" + _objectName;
+            String url = "http://superapp-apis.appspot.com/api/superapp_" + _objectName + "s";
 
             Log.d("debugme", url);
 

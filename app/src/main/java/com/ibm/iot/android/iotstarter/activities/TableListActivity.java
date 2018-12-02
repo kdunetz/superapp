@@ -225,7 +225,9 @@ Log.d("debugme", "start Dynamic Table List Activity");
                                 b.putString("object_name", objectName);
                                 b.putString("form_type", "display"); // display, create, edit
                                 try {
-                                    b.putString("data_url", "https://new-node-red-demo-kad.mybluemix.net/getAll?object_name=" + objectName);
+                                    //b.putString("data_url", "https://new-node-red-demo-kad.mybluemix.net/getAll?object_name=" + objectName);
+                                    b.putString("data_url", "http://superapp-apis.appspot.com/api/superapp_" + objectName + "s");
+
                                 } catch (Exception e) {
                                     Log.e("debugme", "Problem with JSON Object", e);
                                 }

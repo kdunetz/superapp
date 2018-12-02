@@ -19,6 +19,9 @@ import android.*;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Application;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -38,7 +41,9 @@ import android.media.AudioManager;
 import android.os.Build;
 import android.provider.Telephony;
 import android.speech.tts.TextToSpeech;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.os.AsyncTask;
@@ -56,19 +61,20 @@ import com.cloudant.client.api.CloudantClient;
 import com.cloudant.client.api.Database;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.ibm.iot.android.iotstarter.utils.Constants;
 import com.ibm.iot.android.iotstarter.utils.DeviceSensor;
 import com.ibm.iot.android.iotstarter.utils.IoTProfile;
 import com.ibm.iot.android.iotstarter.utils.Deal;
 import com.ibm.iot.android.iotstarter.utils.RequestQueueSingleton;
 import com.ibm.iot.android.iotstarter.utils.User;
-//import com.ibm.mobilefirstplatform.clientsdk.android.push.api.MFPPush;
-//import com.ibm.mobilefirstplatform.clientsdk.android.push.api.MFPPushException;
-//import com.ibm.mobilefirstplatform.clientsdk.android.push.api.MFPPushNotificationListener;
-//import com.ibm.mobilefirstplatform.clientsdk.android.push.api.MFPPushResponseListener;
-//import com.ibm.mobilefirstplatform.clientsdk.android.push.api.MFPPushResponseListener;
+import com.ibm.iot.android.iotstarter.utils.PubsubPublisher;
 import com.ibm.iot.android.iotstarter.utils.Utility;
-import com.ibm.mqa.MQA;
+//import com.ibm.mqa.MQA;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -101,11 +107,6 @@ import org.json.JSONObject;
  */
 public class IoTStarterApplication extends Application {
     private final static String TAG = IoTStarterApplication.class.getName();
-    // private MFPPushNotificationListener notificationListener = null;
-
-    private Activity mActivity; // KAD added for Push
-    //public static MFPPush push = null; // KAD added for Push
-
 
     // Current activity of the application, updated whenever activity is changed
     private String currentRunningActivity;
@@ -154,14 +155,14 @@ public class IoTStarterApplication extends Application {
     public JSONObject appUser = null;
     public String httpResponse = null;
     public TextToSpeech engine = null;
-    Vector couponCompanies = new Vector();
+    public Vector couponCompanies = new Vector();
 
     // Variables to be downloaded from central site or configured locally
     public int sensorTiming = 10000; // how often the sensor data is sent to the Cloud...don't want to waste BW unnecessarily
-//    public String metaDataURL = "https://new-node-red-demo-kad.mybluemix.net/getmetadata";
+    //    public String metaDataURL = "https://new-node-red-demo-kad.mybluemix.net/getmetadata";
 //    public String getBusinessesURL = "http://new-node-red-demo-kad.mybluemix.net/businessesInArea";
-    public String metaDataURL = "http://superapp-apis.appspot.com/getmetadata";
-    public String getBusinessesURL = "http://superapp-apis.appspot.com/businessesInArea";
+    public String metaDataURL = "http://superapp-apis.appspot.com/api/superapp_metadata";
+    public String getBusinessesURL = "http://superapp-apis.appspot.com/api/businessesInArea";
 
     public String apiString2 = ""; //unused
     public String apiString3 = ""; //unused
@@ -172,6 +173,7 @@ public class IoTStarterApplication extends Application {
     public int speakerVolume = 15;
     public double speed = 0;
     public View mapResourceView = null;
+    public PubsubPublisher mPubsubPublisher;
 
 
     /**
@@ -190,7 +192,8 @@ public class IoTStarterApplication extends Application {
         localBusinessSearchRadius = Utility.parseInt(hash.get("local_business_search_radius").toString());
         speakerVolume = Utility.parseInt(hash.get("speaker_volume").toString());
 
-        new ConnectToCloudant().execute("");
+        //new ConnectToCloudant().execute("");
+        Utility.getDeals(this.getApplicationContext(), this);
 
         this.setDeviceId("iot-starter-android");
         this.setOrganization("3alh1w");
@@ -198,23 +201,16 @@ public class IoTStarterApplication extends Application {
 
         loadProfiles();
 
-        /*
-        try {
-            BMSClient.getInstance().initialize(getApplicationContext(), "http://sharp-kad-demo.mybluemix.net", "0e3e5370-d7ee-43a0-8581-c429b256c0f7");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        */
+        /* KAD not used anymore
         com.ibm.mqa.config.Configuration configuration = new com.ibm.mqa.config.Configuration.Builder(this)
                 .withAPIKey(APP_KEY) //Provides the quality assurance application APP_KEY
                 .withMode(MQA.Mode.QA) //Selects the quality assurance application mod
                 .withReportOnShakeEnabled(true) //Enables shake report trigger
                 .build();
         MQA.startNewSession(this, configuration);
-
-        //enablePush(true);
+*/
         /* KAD added May 30th to have tts.speak adjustable by sound buttons */
-        AudioManager am = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
         //int amStreamMusicMaxVol = am.getStreamMaxVolume(am.STREAM_MUSIC);
         //Log.d("debugme", "Speaker Volume Max = " + amStreamMusicMaxVol);
@@ -241,39 +237,41 @@ public class IoTStarterApplication extends Application {
                 });
         RequestQueueSingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
 
-    }
-
-
-    /**
-     * Initializes Push and registers the device. Uses a callback to the MainActivity to maintain proper UI.
-     */
-    /*
-    public void enablePush(boolean enable) {
-        MFPPush.getInstance().initialize(getApplicationContext());
-        MFPPush push = MFPPush.getInstance();
-        Log.d("IN HERE", "IN HERE");
-        MFPPushResponseListener listener = new MFPPushResponseListener<String>() {
-            @Override
-            public void onSuccess(String s) {
-                //cb.success(s);
-                Log.d(TAG, "on Success");
+        // start Cloud PubSub Publisher if cloud credentials are present.
+        int credentialId = getResources().getIdentifier("credentials", "raw", getPackageName());
+        if (credentialId != 0) {
+            try {
+                mPubsubPublisher = new PubsubPublisher(this, "weatherstation",
+                        "kevindunetz-222218", "driving-commands-topic-1", credentialId);
+                //mPubsubPublisher.start();
+            } catch (IOException e) {
+                Log.e(TAG, "error creating pubsub publisher", e);
             }
-
-            @Override
-            public void onFailure(MFPPushException e) {
-                //cb.error(e);
-                Log.d(TAG, "on Failure");
-            }
-        };
-
-        if (enable) {
-            Log.d(TAG, "Registering");
-            push.register(listener);
-        } else {
-            push.unregister(listener);
         }
+
+        FirebaseMessaging.getInstance().subscribeToTopic("all");
+
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "getInstanceId failed", task.getException());
+                            return;
+                        }
+
+                        // Get new Instance ID token
+                        String token = task.getResult().getToken();
+
+                        // Log and toast
+                        //String msg = getString(R.string.msg_token_fmt, token);
+                        Log.d(TAG, "Token = " +  token);
+                        //Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+
     }
-    */
 
     /**
      * Called when old application stored settings values are found.
@@ -789,7 +787,7 @@ public class IoTStarterApplication extends Application {
                         .password("44ea0e6682c63ea1e73b24c2fe1bf5b1a37c4e2ad205bb612a54d1d2e81d40ad")
                         .build();
                 if (client != null) Log.d(TAG, "Cloudant Client initialized");
-                if (true)
+                if (false)
                 {
 
 // Note: for Cloudant Local or Apache CouchDB use:
