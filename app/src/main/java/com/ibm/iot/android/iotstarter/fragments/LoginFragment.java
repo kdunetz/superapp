@@ -28,9 +28,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import com.ibm.iot.android.iotstarter.IoTStarterApplication;
 import com.ibm.iot.android.iotstarter.R;
-import com.ibm.iot.android.iotstarter.activities.DynamicTableActivity;
+import com.ibm.iot.android.iotstarter.activities.LoginActivity;
 import com.ibm.iot.android.iotstarter.activities.MainActivity;
-import com.ibm.iot.android.iotstarter.activities.RegisterActivity;
 import com.ibm.iot.android.iotstarter.utils.Constants;
 import com.ibm.iot.android.iotstarter.utils.DeviceSensor;
 import com.ibm.iot.android.iotstarter.utils.LocationUtils;
@@ -232,7 +231,7 @@ public class LoginFragment extends IoTStarterFragment {
             public void onClick(View v) {
                 // TODO Auto-generated method stub
                 try {
-                    Intent registerIntent = new Intent(v.getContext(), RegisterActivity.class);
+                    Intent registerIntent = new Intent(v.getContext(), LoginActivity.class);
                     startActivity(registerIntent);
                 } catch (Exception e) {
                     e.printStackTrace();

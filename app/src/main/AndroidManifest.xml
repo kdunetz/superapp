@@ -106,10 +106,10 @@
             android:name=".activities.SelectImageActivity"
             android:launchMode="singleTask" />
         <activity
-            android:name=".activities.RegisterActivity"
+            android:name=".activities.LoginActivity"
             android:launchMode="singleTask" />
         <activity
-            android:name=".activities.RegisterActivity2"
+            android:name=".activities.RegisterNewUserActivity"
             android:launchMode="singleTask" />
         <activity
             android:name=".activities.DriveCarActivity"

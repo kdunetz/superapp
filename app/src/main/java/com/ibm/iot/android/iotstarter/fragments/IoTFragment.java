@@ -130,12 +130,13 @@ public class IoTFragment extends IoTStarterFragment {
 
         ImageButton voiceResponse = (ImageButton) getActivity().findViewById((R.id.get_voice_command));
 
-        voiceResponse.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startVoiceInput();
-            }
-        });
+        if (voiceResponse != null)
+            voiceResponse.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startVoiceInput();
+                }
+            });
 
 
 
@@ -162,8 +163,11 @@ public class IoTFragment extends IoTStarterFragment {
 
                         }
                         else
-                        if (text.toUpperCase().startsWith("SEND TEXT TO RICARDO") && text.length() > 20)
-                            sendSMS("7037282830", text.substring(21));
+                        if (text.toUpperCase().startsWith("SEND TEXT TO TY") && text.length() > 15)
+                            sendSMS("7329106810", text.substring(16));
+                        else
+                        if (text.toUpperCase().startsWith("SEND TEXT TO TIE") && text.length() > 16)
+                            sendSMS("7329106810", text.substring(17));
                         else
                         if (text.toUpperCase().startsWith("SEND TEXT TO KEVIN") && text.length() > 18)
                             sendSMS("7034083959", text.substring(19));

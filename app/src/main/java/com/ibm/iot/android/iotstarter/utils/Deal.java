@@ -1,4 +1,6 @@
 package com.ibm.iot.android.iotstarter.utils;
+import android.util.Log;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.Iterator;
@@ -36,6 +38,8 @@ public class Deal {
             try {
                 value = jsonObject.get(key);
             } catch (JSONException e) {
+                Log.d("IN HERE KEVIN", "CRASHING WHILE LOADING");
+
                 throw new RuntimeException(e);
             }
             if (key.equals("deal")) {
@@ -63,6 +67,7 @@ public class Deal {
                 this.coupon_expiration_days = (String) value;
            }
         }
+        this.lastSpoke = false;
     }
     public Deal(boolean isExample) {
         this.isExample = isExample; // KAD have no idea why this is here ...please remove
@@ -181,7 +186,7 @@ public class Deal {
     }
 
     public String toString() {
-        return "{ id: " + _id + ",\nrev: " + _rev + ",\nlast_spoke: " + lastSpoke + "\n, \"deal\": " + deal + "\n" + latitude + "\n" + longitude + "\n" + num_days + "\n" + coupon_expiration_days + "}";
+        return "{ id: " + _id + ",\nrev: " + _rev + ",\nlast_spoke: " + lastSpoke + "\n deal: " + deal + "\nlatitude: " + latitude + "\nlongitude: " + longitude + "\nnum_days: " + num_days + "\ncoupon_expiration_days: " + coupon_expiration_days + "}";
     }
     public String toJSON() {
         return "{ \"last_spoke\": " + lastSpoke + "\n,\"deal\": \"" + deal + "\",\n\"latitude\": \"" + latitude + "\",\n\"longitude\":\"" + longitude + "\",\n\"num_days\":\"" + num_days + "\",\"creation_date\":\"" + creation_date + "\"\n}";

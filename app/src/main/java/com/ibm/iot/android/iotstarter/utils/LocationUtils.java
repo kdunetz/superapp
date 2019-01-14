@@ -332,13 +332,18 @@ Log.d("debugme", locationChangedCounter + "");
 
                 Log.d(TAG, message);
                 //app.getMessageLog().add(message);
+                //if (dist5 < app.dealDistance)
+                //    Log.d(TAG, "Found something close");
                 if (dist5 < app.dealDistance && !deal.getLastSpoke()) { // 200
+                    Log.d(TAG, "Found a matching deal");
                     app.getMessageLog().add("Entering Playing " + deal.getDeal());
                     if (deal.playOnFrontSide() && deal.getDeal().length() < app.maxDealLength)
                         app.engine.speak(deal.getDeal(), TextToSpeech.QUEUE_ADD, null, null);
                     deal.setLastSpoke(true);
                 }
                 if (dist5 > app.dealDistance && deal.getLastSpoke()) { //200
+                    Log.d(TAG, "Found a matching deal leaving");
+
                     app.getMessageLog().add("Leaving Playing " + deal.getDeal());
                     if (deal.playOnBackSide() && deal.getDeal().length() < app.maxDealLength)
                         app.engine.speak(deal.getDeal(), TextToSpeech.QUEUE_ADD, null, null);

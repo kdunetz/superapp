@@ -10,7 +10,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:background="@drawable/ic_background"
 
-    tools:context="com.ibm.iot.android.iotstarter.activities.RegisterActivity">
+    tools:context="com.ibm.iot.android.iotstarter.activities.LoginActivity">
 
     <!-- Login progress -->
     <ProgressBar

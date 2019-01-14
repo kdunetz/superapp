@@ -45,6 +45,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.ibm.iot.android.iotstarter.IoTStarterApplication;
 import com.ibm.iot.android.iotstarter.R;
@@ -541,17 +542,11 @@ public class Utility extends Object {
             RequestQueueSingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
         }
     }
+
     public static void saveUser(final Context context, final IoTStarterApplication app) {
 
-        String url1 = "";
-        try {
-            //url1 = "https://new-node-red-demo-kad.mybluemix.net/save?object_name=object_one";
-            url1 = "http://superapp-apis.appspot.com/api/superapp_users";
-        }
-        catch (Exception e) {
-            Log.e("debugme", "Couldn't find ID in App User Record...returning without doing anything", e);
-            return;
-        }
+        String url1 = "http://superapp-apis.appspot.com/api/superapp_users";
+
         String url2 = "";
         try {
             //url2 = "https://new-node-red-demo-kad.mybluemix.net/getobject?object_name=object_one&id=" + app.appUser.getString("_id");
@@ -622,6 +617,50 @@ try {
 {
     Log.e("debugme", "problem saving", e);
 }
+
+        RequestQueueSingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+        // 2nd call
+
+    }
+    public static void createUser(final Context context, final IoTStarterApplication app) {
+
+        String url1 = "";
+        try {
+            //url1 = "https://new-node-red-demo-kad.mybluemix.net/save?object_name=object_one";
+            url1 = "http://superapp-apis.appspot.com/api/superapp_users";
+        }
+        catch (Exception e) {
+            Log.e("debugme", "Couldn't find ID in App User Record...returning without doing anything", e);
+            return;
+        }
+
+        Log.d("debugme", "Getting AppUser Request -  " + url1);
+        JsonObjectRequest jsonObjectRequest = null;
+        try {
+
+            jsonObjectRequest = new JsonObjectRequest
+                    (Request.Method.POST, url1, new JSONObject(app.appUser.toString()), new Response.Listener<JSONObject>() {
+
+                        @Override
+                        public void onResponse(JSONObject response) {
+
+                            Log.d("debugme", "Refresh AppUser Response First One -" + response.toString());
+                            // KAD do something
+
+                        }
+                    }, new Response.ErrorListener() {
+
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            // TODO: Handle error
+                            Log.d("debugme", "Refresh AppUser Record - " + error.getMessage());
+
+                        }
+                    });
+        } catch (Exception e)
+        {
+            Log.e("debugme", "problem saving", e);
+        }
 
         RequestQueueSingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
         // 2nd call
@@ -752,7 +791,7 @@ try {
                                     }
                                     app.dealLocations.add(deal);
 
-                                    Log.d(TAG, "KAD cloudant " + deal.toString());
+                                    Log.d(TAG, "KAD adding deal to dealLocations " + deal.toString());
 
                             }
 
