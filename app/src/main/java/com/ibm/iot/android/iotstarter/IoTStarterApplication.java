@@ -60,6 +60,7 @@ import com.cloudant.client.api.ClientBuilder;
 import com.cloudant.client.api.CloudantClient;
 import com.cloudant.client.api.Database;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -153,6 +154,7 @@ public class IoTStarterApplication extends Application {
     public Database db2 = null;
     public Database userDB = null;
     public JSONObject appUser = null;
+    public Bitmap bitmap = null;
     public String httpResponse = null;
     public TextToSpeech engine = null;
     public Vector couponCompanies = new Vector();

@@ -279,16 +279,24 @@ public class MapFragment extends IoTStarterFragment implements OnMapReadyCallbac
         mMap.setMapType(mMap.MAP_TYPE_SATELLITE);
         Log.d("debugme", "before changing bitmap MapFragment");
         BitmapDescriptor newBitmap = null;
-        if (app.getCurrentUser() != null && app.getCurrentUser().equalsIgnoreCase("kevindunetz@gmail.com"))
-            newBitmap = BitmapDescriptorFactory.fromResource(R.mipmap.kevindunetz);
-        else if (app.getCurrentUser() != null && app.getCurrentUser().equalsIgnoreCase("ryandunetz@gmail.com"))
-            newBitmap = BitmapDescriptorFactory.fromResource(R.mipmap.ryandunetz);
-        else if (app.getCurrentUser() != null && app.getCurrentUser().equalsIgnoreCase("rosadunetz@gmail.com"))
-            newBitmap = BitmapDescriptorFactory.fromResource(R.mipmap.rosadunetz);
-        else if (app.getCurrentUser() != null && app.getCurrentUser().equalsIgnoreCase("andrewdunetz@gmail.com"))
-            newBitmap = BitmapDescriptorFactory.fromResource(R.mipmap.andrewdunetz);
-        else {
-
+        if (false)
+        {
+            if (app.getCurrentUser() != null && app.getCurrentUser().equalsIgnoreCase("kevindunetz@gmail.com")) {
+                newBitmap = BitmapDescriptorFactory.fromResource(R.mipmap.kevindunetz);
+                newBitmap = BitmapDescriptorFactory.fromBitmap(app.bitmap); //BitmapDescriptorFactory.fromBitmap(getBitmapFromURL("http://www.graphicsfuel.com/wp-content/uploads/2011/12/search-icon-512.png"));
+            } else if (app.getCurrentUser() != null && app.getCurrentUser().equalsIgnoreCase("ryandunetz@gmail.com"))
+                newBitmap = BitmapDescriptorFactory.fromResource(R.mipmap.ryandunetz);
+            else if (app.getCurrentUser() != null && app.getCurrentUser().equalsIgnoreCase("rosadunetz@gmail.com"))
+                newBitmap = BitmapDescriptorFactory.fromResource(R.mipmap.rosadunetz);
+            else if (app.getCurrentUser() != null && app.getCurrentUser().equalsIgnoreCase("andrewdunetz@gmail.com"))
+                newBitmap = BitmapDescriptorFactory.fromResource(R.mipmap.andrewdunetz);
+        }
+        if (app.bitmap != null)
+        {
+            newBitmap = BitmapDescriptorFactory.fromBitmap(app.bitmap);
+        }
+        else
+        {
             Log.d("debugme", "in here for some reason");
             newBitmap = BitmapDescriptorFactory.fromResource(R.drawable.ic_logo_b);
         }

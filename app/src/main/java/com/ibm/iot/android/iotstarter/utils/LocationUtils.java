@@ -462,15 +462,19 @@ Log.d("debugme123", lastSpoken.toString() + " --- " + lastSpoken.containsKey(dea
 
             BitmapDescriptor newBitmap = null;
             //BitmapDescriptorFactory.fromResource(R.mipmap.ic_marker);
-            if (app.getCurrentUser() != null && app.getCurrentUser().equalsIgnoreCase("kevindunetz@gmail.com"))
-                newBitmap = BitmapDescriptorFactory.fromResource(R.mipmap.kevindunetz);
-            else if (app.getCurrentUser() != null && app.getCurrentUser().equalsIgnoreCase("ryandunetz@gmail.com"))
-                newBitmap = BitmapDescriptorFactory.fromResource(R.mipmap.ryandunetz);
-            else if (app.getCurrentUser() != null && app.getCurrentUser().equalsIgnoreCase("andrewdunetz@gmail.com"))
-                newBitmap = BitmapDescriptorFactory.fromResource(R.mipmap.andrewdunetz);
-            else if (app.getCurrentUser() != null && app.getCurrentUser().equalsIgnoreCase("rosadunetz@gmail.com"))
-                newBitmap = BitmapDescriptorFactory.fromResource(R.mipmap.rosadunetz);
-
+            newBitmap = BitmapDescriptorFactory.fromBitmap(app.bitmap);
+            if (false) {
+                if (app.getCurrentUser() != null && app.getCurrentUser().equalsIgnoreCase("kevindunetz@gmail.com")) {
+                    newBitmap = BitmapDescriptorFactory.fromResource(R.mipmap.kevindunetz);
+                    newBitmap = BitmapDescriptorFactory.fromBitmap(app.bitmap); //BitmapDescriptorFactory.fromBitmap(getBitmapFromURL("http://www.graphicsfuel.com/wp-content/uploads/2011/12/search-icon-512.png"));
+                    Log.d("debugme", "before changing bitmap LocationUtils KEVIN");
+                } else if (app.getCurrentUser() != null && app.getCurrentUser().equalsIgnoreCase("ryandunetz@gmail.com"))
+                    newBitmap = BitmapDescriptorFactory.fromResource(R.mipmap.ryandunetz);
+                else if (app.getCurrentUser() != null && app.getCurrentUser().equalsIgnoreCase("andrewdunetz@gmail.com"))
+                    newBitmap = BitmapDescriptorFactory.fromResource(R.mipmap.andrewdunetz);
+                else if (app.getCurrentUser() != null && app.getCurrentUser().equalsIgnoreCase("rosadunetz@gmail.com"))
+                    newBitmap = BitmapDescriptorFactory.fromResource(R.mipmap.rosadunetz);
+            }
             now = googleMap.addMarker(new MarkerOptions().icon(newBitmap).position(latLng).title(app.getCurrentUser()));
             app.addMapMarker(app.getCurrentUser(), now);
 

@@ -43,6 +43,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.ibm.iot.android.iotstarter.IoTStarterApplication;
 import com.ibm.iot.android.iotstarter.R;
+import com.ibm.iot.android.iotstarter.utils.GetImageTask;
 import com.ibm.iot.android.iotstarter.utils.RequestQueueSingleton;
 import com.ibm.iot.android.iotstarter.utils.RestTask;
 import com.ibm.iot.android.iotstarter.utils.Utility;
@@ -258,6 +259,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                                         Bundle b = new Bundle();
                                         b.putString("email", email);
                                         mainIntent.putExtras(b);
+                                        GetImageTask task = new GetImageTask(LoginActivity.this, app,"NADA");
+                                        task.execute(email);
 
                                         LoginActivity.this.startActivity(mainIntent, b);
                                         unregisterReceiver(receiver);
